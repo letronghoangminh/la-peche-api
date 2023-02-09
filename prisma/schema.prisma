@@ -17,6 +17,7 @@ model user {
   verifyAt           DateTime? @db.DateTime(0)
   premiumEndsAt      DateTime? @db.DateTime(0)
   createdAt          DateTime  @default(now()) @db.DateTime(0)
+  updatedAt          DateTime  @updatedAt @db.DateTime(0)
   isIntroShownFields Json
   lastOnline         DateTime
   role               role      @default(USER)
@@ -60,11 +61,12 @@ model user {
 
 model message {
   id        Int           @id @default(autoincrement())
-  message   String?
   type      message_types @default(TEXT)
+  message   String?
   voiceUrl  String?
   imageUrl  String?
   createdAt DateTime      @default(now()) @db.DateTime(0)
+  updatedAt DateTime      @updatedAt @db.DateTime(0)
 
   senderId   Int
   sender     user @relation("messages_sent", references: [id], fields: [senderId], onDelete: Cascade, onUpdate: NoAction, map: "message_senderId_fk")
@@ -79,6 +81,7 @@ model notification {
   id        Int      @id @default(autoincrement())
   text      String
   createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
 
   userId Int
   user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "notification_userId_fk")
@@ -91,6 +94,7 @@ model coupon {
   code            String
   discountPercent Float
   createdAt       DateTime @default(now()) @db.DateTime(0)
+  updatedAt       DateTime @updatedAt @db.DateTime(0)
 
   userId Int
   user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "coupon_userId_fk")
@@ -99,9 +103,11 @@ model coupon {
 }
 
 model user_image {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   url         String
   isThumbnail Boolean
+  createdAt   DateTime @default(now()) @db.DateTime(0)
+  updatedAt   DateTime @updatedAt @db.DateTime(0)
 
   userId Int
   user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_image_userId_fk")
@@ -114,6 +120,7 @@ model report {
   category  String
   reason    String
   createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
 
   reporterId Int
   reporter   user @relation("reports_made", references: [id], fields: [reporterId], onDelete: Cascade, onUpdate: NoAction, map: "report_reporterId_fk")

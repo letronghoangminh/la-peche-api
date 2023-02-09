@@ -9,6 +9,7 @@ CREATE TABLE `user` (
     `verifyAt` DATETIME(0) NULL,
     `premiumEndsAt` DATETIME(0) NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `updatedAt` DATETIME(0) NOT NULL,
     `isIntroShownFields` JSON NOT NULL,
     `lastOnline` DATETIME(3) NOT NULL,
     `role` ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER',
@@ -42,11 +43,12 @@ CREATE TABLE `user` (
 -- CreateTable
 CREATE TABLE `message` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `message` VARCHAR(191) NULL,
     `type` ENUM('TEXT', 'VOICE', 'IMAGE') NOT NULL DEFAULT 'TEXT',
+    `message` VARCHAR(191) NULL,
     `voiceUrl` VARCHAR(191) NULL,
     `imageUrl` VARCHAR(191) NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `updatedAt` DATETIME(0) NOT NULL,
     `senderId` INTEGER NOT NULL,
     `receiverId` INTEGER NOT NULL,
 
@@ -60,6 +62,7 @@ CREATE TABLE `notification` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `text` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `updatedAt` DATETIME(0) NOT NULL,
     `userId` INTEGER NOT NULL,
 
     INDEX `notification_userId_fk`(`userId`),
@@ -72,6 +75,7 @@ CREATE TABLE `coupon` (
     `code` VARCHAR(191) NOT NULL,
     `discountPercent` DOUBLE NOT NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `updatedAt` DATETIME(0) NOT NULL,
     `userId` INTEGER NOT NULL,
 
     INDEX `coupon_userId_fk`(`userId`),
@@ -83,6 +87,8 @@ CREATE TABLE `user_image` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `url` VARCHAR(191) NOT NULL,
     `isThumbnail` BOOLEAN NOT NULL,
+    `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `updatedAt` DATETIME(0) NOT NULL,
     `userId` INTEGER NOT NULL,
 
     INDEX `user_image_userId_fk`(`userId`),
@@ -95,6 +101,7 @@ CREATE TABLE `report` (
     `category` VARCHAR(191) NOT NULL,
     `reason` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `updatedAt` DATETIME(0) NOT NULL,
     `reporterId` INTEGER NOT NULL,
     `targetId` INTEGER NOT NULL,
 
