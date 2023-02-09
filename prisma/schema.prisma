@@ -1,0 +1,144 @@
+datasource db {
+  url      = env("DATABASE_URL")
+  provider = "mysql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model user {
+  id                 Int       @id @default(autoincrement())
+  hashedPassword     String
+  saltPassword       String
+  cluster            Int?
+  isActivated        Boolean   @default(false)
+  isDeleted          Boolean   @default(false)
+  verifyAt           DateTime? @db.DateTime(0)
+  premiumEndsAt      DateTime? @db.DateTime(0)
+  createdAt          DateTime  @default(now()) @db.DateTime(0)
+  updatedAt          DateTime  @updatedAt @db.DateTime(0)
+  isIntroShownFields Json
+  lastOnline         DateTime
+  role               role      @default(USER)
+
+  name        String
+  gender      String
+  status      String
+  orientation String
+  biographic  String?
+
+  email       String  @unique
+  yearOfBirth Int?
+  bodyType    String?
+  diet        String?
+  drinks      String?
+  drugs       String?
+  education   String?
+  ethincity   String?
+  height      Float?
+  income      Float?
+  job         String?
+  location    String?
+  offspring   String?
+  pets        String?
+  sign        String?
+  smokes      String?
+  speaks      String?
+
+  messagesSent     message[]      @relation("messages_sent")
+  messagesReceived message[]      @relation("messages_received")
+  notifications    notification[]
+  coupons          coupon[]
+  userImages       user_image[]
+  reportsMade      report[]       @relation("reports_made")
+  reportsReceived  report[]       @relation("reports_received")
+  likedBy          user[]         @relation("user_likes")
+  liking           user[]         @relation("user_likes")
+  staredBy         user[]         @relation("user_stars")
+  staring          user[]         @relation("user_stars")
+}
+
+model message {
+  id        Int           @id @default(autoincrement())
+  type      message_types @default(TEXT)
+  message   String?
+  voiceUrl  String?
+  imageUrl  String?
+  createdAt DateTime      @default(now()) @db.DateTime(0)
+  updatedAt DateTime      @updatedAt @db.DateTime(0)
+
+  senderId   Int
+  sender     user @relation("messages_sent", references: [id], fields: [senderId], onDelete: Cascade, onUpdate: NoAction, map: "message_senderId_fk")
+  receiverId Int
+  receiver   user @relation("messages_received", references: [id], fields: [receiverId], onDelete: Cascade, onUpdate: NoAction, map: "message_receiverId_fk")
+
+  @@index([senderId], map: "message_senderId_fk")
+  @@index([receiverId], map: "message_receiverId_fk")
+}
+
+model notification {
+  id        Int      @id @default(autoincrement())
+  text      String
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+
+  userId Int
+  user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "notification_userId_fk")
+
+  @@index([userId], map: "notification_userId_fk")
+}
+
+model coupon {
+  id              Int      @id @default(autoincrement())
+  code            String
+  discountPercent Float
+  createdAt       DateTime @default(now()) @db.DateTime(0)
+  updatedAt       DateTime @updatedAt @db.DateTime(0)
+
+  userId Int
+  user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "coupon_userId_fk")
+
+  @@index([userId], map: "coupon_userId_fk")
+}
+
+model user_image {
+  id          Int      @id @default(autoincrement())
+  url         String
+  isThumbnail Boolean
+  createdAt   DateTime @default(now()) @db.DateTime(0)
+  updatedAt   DateTime @updatedAt @db.DateTime(0)
+
+  userId Int
+  user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_image_userId_fk")
+
+  @@index([userId], map: "user_image_userId_fk")
+}
+
+model report {
+  id        Int      @id @default(autoincrement())
+  category  String
+  reason    String
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+
+  reporterId Int
+  reporter   user @relation("reports_made", references: [id], fields: [reporterId], onDelete: Cascade, onUpdate: NoAction, map: "report_reporterId_fk")
+
+  targetId Int
+  target   user @relation("reports_received", references: [id], fields: [targetId], onDelete: Cascade, onUpdate: NoAction, map: "report_targetId_fk")
+
+  @@index([reporterId], map: "report_reporterId_fk")
+  @@index([reporterId], map: "report_targetId_fk")
+}
+
+enum message_types {
+  TEXT
+  VOICE
+  IMAGE
+}
+
+enum role {
+  USER
+  ADMIN
+}
