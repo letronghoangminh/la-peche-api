@@ -1,0 +1,72 @@
+version: 2.1
+
+jobs:
+  lint:
+    docker:
+      - image: cimg/node:17.4.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          name: Format code
+          command: npm run format
+      - run:
+          name: Lint check
+          command: npm run lint
+
+  build-and-deploy-image:
+    docker:
+      - image: cimg/node:17.4.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command:  npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      - run:
+          name: Login Dockerhub
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - run:
+          name: Build docker image
+          command: |
+            TAG=0.1.$CIRCLE_BUILD_NUM
+            docker build -t $DOCKER_USER/la-peche-api:latest ./
+            docker build -t $DOCKER_USER/la-peche-api:$TAG ./
+      - run:
+          name: Check images
+          command: docker images
+      - run:
+          name: Push images
+          command: |
+            TAG=0.1.$CIRCLE_BUILD_NUM
+            docker push $DOCKER_USER/la-peche-api:latest
+            docker push $DOCKER_USER/la-peche-api:$TAG
+ 
+workflows:
+  ci-api:
+    jobs:
+      - lint
+      - build-and-deploy-image:
+          requires:
+            - lint 
+          filters:
+            branches:
+              only:
+                - main
