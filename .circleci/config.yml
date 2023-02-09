@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   lint:
     docker:
-      - image: cimg/node:17.4.0
+      - image: cimg/node:18.14.0
     steps:
       - checkout
       - restore_cache:
@@ -24,7 +24,7 @@ jobs:
 
   build-and-deploy-image:
     docker:
-      - image: cimg/node:17.4.0
+      - image: cimg/node:18.14.0
     steps:
       - checkout
       - restore_cache:
