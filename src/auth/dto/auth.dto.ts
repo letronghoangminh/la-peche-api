@@ -8,7 +8,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class AuthDto {
+export class RegisterDto {
   @IsEmail()
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true, nullable: false })
@@ -27,5 +27,17 @@ export class AuthDto {
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message: 'password too weak',
   })
+  password: string;
+}
+
+export class LoginDto {
+  @IsEmail()
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  email: string;
+
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  @IsString()
   password: string;
 }
