@@ -34,14 +34,9 @@ export class AuthService {
 
       return this.signToken(user);
     } catch (error) {
-      if (
-        error instanceof
-        Prisma.PrismaClientKnownRequestError
-      ) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ForbiddenException(
-            'Credentials taken',
-          );
+          throw new ForbiddenException('Credentials taken');
         }
       }
       throw error;
@@ -55,22 +50,26 @@ export class AuthService {
       },
     });
 
-    if (!user) throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
-    if (user.isDeleted) throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
-    if (!user.isActivated) throw new ForbiddenException(ErrorMessages.AUTH.USER_INACTIVE);
+    if (!user)
+      throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
+    if (user.isDeleted)
+      throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
+    if (!user.isActivated)
+      throw new ForbiddenException(ErrorMessages.AUTH.USER_INACTIVE);
 
     const passwordMatches = await argon.verify(
       user.hashedPassword,
       dto.password,
     );
 
-    if (!passwordMatches) throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
+    if (!passwordMatches)
+      throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
 
     return this.signToken(user);
   }
 
   async signToken(user: user): Promise<{ token: string }> {
-    const pickedFields: string[] = ['id', 'email', 'name', 'role',];
+    const pickedFields: string[] = ['id', 'email', 'name', 'role'];
     const payload = pick(user, pickedFields);
 
     const jwtSecret = this.config.get('JWT_SECRET');
