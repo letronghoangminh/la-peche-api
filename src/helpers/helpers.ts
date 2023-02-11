@@ -1,0 +1,18 @@
+export const introShownFields = {
+  yearOfBirth: false,
+  bodyType: false,
+  diet: false,
+  drinks: false,
+  drugs: false,
+  education: false,
+  ethnicity: false,
+  height: false,
+  income: false,
+  job: false,
+  location: false,
+  offspring: false,
+  pets: false,
+  sign: false,
+  smokes: false,
+  speaks: false,
+};
