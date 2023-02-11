@@ -18,7 +18,7 @@ model user {
   premiumEndsAt      DateTime? @db.DateTime(0)
   createdAt          DateTime  @default(now()) @db.DateTime(0)
   updatedAt          DateTime  @updatedAt @db.DateTime(0)
-  isIntroShownFields Json
+  introShownFields Json
   lastOnline         DateTime
   role               role      @default(USER)
 
@@ -46,8 +46,6 @@ model user {
   smokes      String?
   speaks      String?
 
-  messagesSent     message[]      @relation("messages_sent")
-  messagesReceived message[]      @relation("messages_received")
   notifications    notification[]
   coupons          coupon[]
   userImages       user_image[]
@@ -57,24 +55,6 @@ model user {
   liking           user[]         @relation("user_likes")
   staredBy         user[]         @relation("user_stars")
   staring          user[]         @relation("user_stars")
-}
-
-model message {
-  id        Int           @id @default(autoincrement())
-  type      message_types @default(TEXT)
-  message   String?
-  voiceUrl  String?
-  imageUrl  String?
-  createdAt DateTime      @default(now()) @db.DateTime(0)
-  updatedAt DateTime      @updatedAt @db.DateTime(0)
-
-  senderId   Int
-  sender     user @relation("messages_sent", references: [id], fields: [senderId], onDelete: Cascade, onUpdate: NoAction, map: "message_senderId_fk")
-  receiverId Int
-  receiver   user @relation("messages_received", references: [id], fields: [receiverId], onDelete: Cascade, onUpdate: NoAction, map: "message_receiverId_fk")
-
-  @@index([senderId], map: "message_senderId_fk")
-  @@index([receiverId], map: "message_receiverId_fk")
 }
 
 model notification {

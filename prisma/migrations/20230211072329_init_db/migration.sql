@@ -10,7 +10,7 @@ CREATE TABLE `user` (
     `premiumEndsAt` DATETIME(0) NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `updatedAt` DATETIME(0) NOT NULL,
-    `isIntroShownFields` JSON NOT NULL,
+    `introShownFields` JSON NOT NULL,
     `lastOnline` DATETIME(3) NOT NULL,
     `role` ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER',
     `name` VARCHAR(191) NOT NULL,
@@ -37,23 +37,6 @@ CREATE TABLE `user` (
     `speaks` VARCHAR(191) NULL,
 
     UNIQUE INDEX `user_email_key`(`email`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `message` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `type` ENUM('TEXT', 'VOICE', 'IMAGE') NOT NULL DEFAULT 'TEXT',
-    `message` VARCHAR(191) NULL,
-    `voiceUrl` VARCHAR(191) NULL,
-    `imageUrl` VARCHAR(191) NULL,
-    `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updatedAt` DATETIME(0) NOT NULL,
-    `senderId` INTEGER NOT NULL,
-    `receiverId` INTEGER NOT NULL,
-
-    INDEX `message_senderId_fk`(`senderId`),
-    INDEX `message_receiverId_fk`(`receiverId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -127,12 +110,6 @@ CREATE TABLE `_user_stars` (
     UNIQUE INDEX `_user_stars_AB_unique`(`A`, `B`),
     INDEX `_user_stars_B_index`(`B`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- AddForeignKey
-ALTER TABLE `message` ADD CONSTRAINT `message_senderId_fk` FOREIGN KEY (`senderId`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
-
--- AddForeignKey
-ALTER TABLE `message` ADD CONSTRAINT `message_receiverId_fk` FOREIGN KEY (`receiverId`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE `notification` ADD CONSTRAINT `notification_userId_fk` FOREIGN KEY (`id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
