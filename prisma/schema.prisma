@@ -8,19 +8,19 @@ generator client {
 }
 
 model user {
-  id                 Int       @id @default(autoincrement())
-  hashedPassword     String
-  saltPassword       String
-  cluster            Int?
-  isActivated        Boolean   @default(false)
-  isDeleted          Boolean   @default(false)
-  verifyAt           DateTime? @db.DateTime(0)
-  premiumEndsAt      DateTime? @db.DateTime(0)
-  createdAt          DateTime  @default(now()) @db.DateTime(0)
-  updatedAt          DateTime  @updatedAt @db.DateTime(0)
+  id               Int       @id @default(autoincrement())
+  hashedPassword   String
+  saltPassword     String
+  cluster          Int?
+  isActivated      Boolean   @default(false)
+  isDeleted        Boolean   @default(false)
+  verifyAt         DateTime? @db.DateTime(0)
+  premiumEndsAt    DateTime? @db.DateTime(0)
+  createdAt        DateTime  @default(now()) @db.DateTime(0)
+  updatedAt        DateTime  @updatedAt @db.DateTime(0)
   introShownFields Json
-  lastOnline         DateTime
-  role               role      @default(USER)
+  lastOnline       DateTime
+  role             role      @default(USER)
 
   name        String
   gender      String
@@ -46,20 +46,21 @@ model user {
   smokes      String?
   speaks      String?
 
-  notifications    notification[]
-  coupons          coupon[]
-  userImages       user_image[]
-  reportsMade      report[]       @relation("reports_made")
-  reportsReceived  report[]       @relation("reports_received")
-  likedBy          user[]         @relation("user_likes")
-  liking           user[]         @relation("user_likes")
-  staredBy         user[]         @relation("user_stars")
-  staring          user[]         @relation("user_stars")
+  notifications   notification[]
+  coupons         coupon[]
+  userImages      user_image[]
+  reportsMade     report[]       @relation("reports_made")
+  reportsReceived report[]       @relation("reports_received")
+  likedBy         user[]         @relation("user_likes")
+  liking          user[]         @relation("user_likes")
+  staredBy        user[]         @relation("user_stars")
+  staring         user[]         @relation("user_stars")
 }
 
 model notification {
   id        Int      @id @default(autoincrement())
   text      String
+  status    String
   createdAt DateTime @default(now()) @db.DateTime(0)
   updatedAt DateTime @updatedAt @db.DateTime(0)
 
@@ -109,7 +110,7 @@ model report {
   target   user @relation("reports_received", references: [id], fields: [targetId], onDelete: Cascade, onUpdate: NoAction, map: "report_targetId_fk")
 
   @@index([reporterId], map: "report_reporterId_fk")
-  @@index([reporterId], map: "report_targetId_fk")
+  @@index([targetId], map: "report_targetId_fk")
 }
 
 enum message_types {

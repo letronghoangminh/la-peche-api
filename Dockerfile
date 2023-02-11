@@ -4,8 +4,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# COPY prisma ./
-# RUN npm prisma generate
+COPY prisma ./
+RUN npm prisma generate
 
 COPY . .
 

@@ -44,6 +44,7 @@ CREATE TABLE `user` (
 CREATE TABLE `notification` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `text` VARCHAR(191) NOT NULL,
+    `status` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `updatedAt` DATETIME(0) NOT NULL,
     `userId` INTEGER NOT NULL,
@@ -89,7 +90,7 @@ CREATE TABLE `report` (
     `targetId` INTEGER NOT NULL,
 
     INDEX `report_reporterId_fk`(`reporterId`),
-    INDEX `report_targetId_fk`(`reporterId`),
+    INDEX `report_targetId_fk`(`targetId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
