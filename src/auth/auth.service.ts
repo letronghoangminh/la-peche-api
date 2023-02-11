@@ -4,8 +4,10 @@ import { AuthDto } from './dto/auth.dto';
 import * as argon from 'argon2';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Prisma } from '@prisma/client';
+import { Prisma, user } from '@prisma/client';
 import { introShownFields } from 'src/helpers/helpers';
+import { pick } from 'lodash';
+import { ErrorMessages } from 'src/helpers/error_messages';
 
 @Injectable()
 export class AuthService {
@@ -27,10 +29,11 @@ export class AuthService {
           gender: '',
           status: '',
           orientation: '',
+          isActivated: true,
         },
       });
 
-      return this.signToken(user.id, user.email);
+      return this.signToken(user);
     } catch (error) {
       if (
         error instanceof
@@ -54,6 +57,7 @@ export class AuthService {
     });
 
     if (!user) throw new ForbiddenException('Credentials incorrect');
+    if (!user.isActivated) throw new ForbiddenException(ErrorMessages.AUTH.USER_INACTIVE);
 
     const passwordMatches = await argon.verify(
       user.hashedPassword,
@@ -62,14 +66,12 @@ export class AuthService {
 
     if (!passwordMatches) throw new ForbiddenException('Credentials incorrect');
 
-    return this.signToken(user.id, user.email);
+    return this.signToken(user);
   }
 
-  async signToken(userId: number, email: string): Promise<{ token: string }> {
-    const payload = {
-      sub: userId,
-      email,
-    };
+  async signToken(user: user): Promise<{ token: string }> {
+    const payload = pick(user, ['id', 'email', 'name', 'role',]);
+
     const jwtSecret = this.config.get('JWT_SECRET');
 
     const token = await this.jwt.signAsync(payload, {
