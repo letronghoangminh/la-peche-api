@@ -10,7 +10,6 @@ generator client {
 model user {
   id               Int       @id @default(autoincrement())
   hashedPassword   String
-  saltPassword     String
   cluster          Int?
   isActivated      Boolean   @default(false)
   isDeleted        Boolean   @default(false)
@@ -19,7 +18,7 @@ model user {
   createdAt        DateTime  @default(now()) @db.DateTime(0)
   updatedAt        DateTime  @updatedAt @db.DateTime(0)
   introShownFields Json
-  lastOnline       DateTime
+  lastOnline       DateTime? @db.DateTime(0)
   role             role      @default(USER)
 
   name        String
@@ -35,7 +34,7 @@ model user {
   drinks      String?
   drugs       String?
   education   String?
-  ethincity   String?
+  ethnicity   String?
   height      Float?
   income      Float?
   job         String?
