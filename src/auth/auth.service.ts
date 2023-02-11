@@ -29,7 +29,6 @@ export class AuthService {
           gender: '',
           status: '',
           orientation: '',
-          isActivated: true,
         },
       });
 
@@ -56,7 +55,8 @@ export class AuthService {
       },
     });
 
-    if (!user) throw new ForbiddenException('Credentials incorrect');
+    if (!user) throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
+    if (user.isDeleted) throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
     if (!user.isActivated) throw new ForbiddenException(ErrorMessages.AUTH.USER_INACTIVE);
 
     const passwordMatches = await argon.verify(
@@ -64,17 +64,18 @@ export class AuthService {
       dto.password,
     );
 
-    if (!passwordMatches) throw new ForbiddenException('Credentials incorrect');
+    if (!passwordMatches) throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
 
     return this.signToken(user);
   }
 
   async signToken(user: user): Promise<{ token: string }> {
-    const payload = pick(user, ['id', 'email', 'name', 'role',]);
+    const pickedFields: string[] = ['id', 'email', 'name', 'role',];
+    const payload = pick(user, pickedFields);
 
     const jwtSecret = this.config.get('JWT_SECRET');
 
-    const token = await this.jwt.signAsync(payload, {
+    const token: string = await this.jwt.signAsync(payload, {
       expiresIn: '60m',
       secret: jwtSecret,
     });

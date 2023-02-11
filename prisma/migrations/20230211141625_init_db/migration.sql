@@ -3,7 +3,7 @@ CREATE TABLE `user` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `hashedPassword` VARCHAR(191) NOT NULL,
     `cluster` INTEGER NULL,
-    `isActivated` BOOLEAN NOT NULL DEFAULT false,
+    `isActivated` BOOLEAN NOT NULL DEFAULT true,
     `isDeleted` BOOLEAN NOT NULL DEFAULT false,
     `verifyAt` DATETIME(0) NULL,
     `premiumEndsAt` DATETIME(0) NULL,

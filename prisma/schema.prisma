@@ -11,7 +11,7 @@ model user {
   id               Int       @id @default(autoincrement())
   hashedPassword   String
   cluster          Int?
-  isActivated      Boolean   @default(false)
+  isActivated      Boolean   @default(true)
   isDeleted        Boolean   @default(false)
   verifyAt         DateTime? @db.DateTime(0)
   premiumEndsAt    DateTime? @db.DateTime(0)
