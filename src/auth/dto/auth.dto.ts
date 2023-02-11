@@ -14,6 +14,11 @@ export class AuthDto {
   @ApiProperty({ type: String, required: true, nullable: false })
   email: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, nullable: false})
+  name: string;
+
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true, nullable: false })
   @IsString()

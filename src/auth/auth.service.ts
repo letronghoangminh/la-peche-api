@@ -25,7 +25,7 @@ export class AuthService {
           email: dto.email,
           hashedPassword: hashedPassword,
           introShownFields: introShownFields,
-          name: '',
+          name: dto.name,
           gender: '',
           status: '',
           orientation: '',
