@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Prisma, user } from '@prisma/client';
 import { introShownFields } from 'src/helpers/helpers';
 import { pick } from 'lodash';
-import { ErrorMessages } from 'src/helpers/messages';
+import { ErrorMessages } from 'src/helpers/helpers';
 
 @Injectable()
 export class AuthService {
