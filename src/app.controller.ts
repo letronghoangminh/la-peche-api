@@ -1,16 +1,24 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AppService } from './app.service';
-import { JwtGuard } from './auth/guard/auth.guard';
+import { UserGuard, AdminGuard } from './auth/guard/auth.guard';
 
 @Controller()
+@ApiTags('DEFAULT')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  @UseGuards(JwtGuard)
+  @Get('user')
+  @UseGuards(UserGuard)
   @ApiBearerAuth()
-  getHello(): string {
+  getUser(): string {
+    return this.appService.getHello();
+  }
+
+  @Get('admin')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  getAdmin(): string {
     return this.appService.getHello();
   }
 }
