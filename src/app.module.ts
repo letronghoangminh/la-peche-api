@@ -6,6 +6,7 @@ import AppConfig from './config/config';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { NotificationModule } from './notification/notification.module';
+import { CouponModule } from './coupon/coupon.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { NotificationModule } from './notification/notification.module';
     }),
     AuthModule,
     NotificationModule,
+    CouponModule,
   ],
   controllers: [AppController],
   providers: [AppService],

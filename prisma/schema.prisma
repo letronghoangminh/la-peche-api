@@ -71,8 +71,9 @@ model notification {
 
 model coupon {
   id              Int      @id @default(autoincrement())
-  code            String
+  code            String @unique
   discountPercent Float
+  isUsed  Boolean @default(false)
   createdAt       DateTime @default(now()) @db.DateTime(0)
   updatedAt DateTime @updatedAt @default(now()) @db.DateTime(0)
 

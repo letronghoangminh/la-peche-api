@@ -25,6 +25,9 @@ export const ErrorMessages = {
   NOTIFICATION: {
     NOTI_NOT_FOUND: 'Notification not found',
   },
+  COUPON: {
+    COUPON_NOT_FOUND: 'Coupon not found',
+  },
 };
 
 export const APISummaries = {
@@ -32,3 +35,16 @@ export const APISummaries = {
   USER: 'User permission required',
   ADMIN: 'Admin permission required',
 };
+
+export function genCouponCode(length = 6): string {
+  let coupon = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const charactersLength: number = characters.length;
+  let counter = 0;
+
+  while (counter < length) {
+    coupon += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return coupon;
+}

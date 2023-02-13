@@ -151,6 +151,7 @@ async function main() {
       code: 'DAKWA',
       discountPercent: 100,
       userId: 1,
+      isUsed: false,
     }
   });
 
