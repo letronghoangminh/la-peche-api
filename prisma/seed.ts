@@ -141,7 +141,7 @@ async function main() {
   await prisma.notification.create({
     data: {
       text: 'Congrats, you are the admin',
-      status: 'Hasn\'t been read',
+      status: 'UNREAD',
       userId: 1,
     }
   });

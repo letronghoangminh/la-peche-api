@@ -8,7 +8,7 @@ CREATE TABLE `user` (
     `verifyAt` DATETIME(0) NULL,
     `premiumEndsAt` DATETIME(0) NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updatedAt` DATETIME(0) NOT NULL,
+    `updatedAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `introShownFields` JSON NOT NULL,
     `lastOnline` DATETIME(0) NULL,
     `role` ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER',
@@ -43,9 +43,9 @@ CREATE TABLE `user` (
 CREATE TABLE `notification` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `text` VARCHAR(191) NOT NULL,
-    `status` VARCHAR(191) NOT NULL,
+    `status` ENUM('READ', 'UNREAD') NOT NULL DEFAULT 'UNREAD',
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updatedAt` DATETIME(0) NOT NULL,
+    `updatedAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `userId` INTEGER NOT NULL,
 
     INDEX `notification_userId_fk`(`userId`),
@@ -58,7 +58,7 @@ CREATE TABLE `coupon` (
     `code` VARCHAR(191) NOT NULL,
     `discountPercent` DOUBLE NOT NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updatedAt` DATETIME(0) NOT NULL,
+    `updatedAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `userId` INTEGER NOT NULL,
 
     INDEX `coupon_userId_fk`(`userId`),
@@ -71,7 +71,7 @@ CREATE TABLE `user_image` (
     `url` VARCHAR(191) NOT NULL,
     `isThumbnail` BOOLEAN NOT NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updatedAt` DATETIME(0) NOT NULL,
+    `updatedAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `userId` INTEGER NOT NULL,
 
     INDEX `user_image_userId_fk`(`userId`),
@@ -84,7 +84,7 @@ CREATE TABLE `report` (
     `category` VARCHAR(191) NOT NULL,
     `reason` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `updatedAt` DATETIME(0) NOT NULL,
+    `updatedAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `reporterId` INTEGER NOT NULL,
     `targetId` INTEGER NOT NULL,
 

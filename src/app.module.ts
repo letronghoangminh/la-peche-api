@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import AppConfig from './config/config';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
     }),
     AuthModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
