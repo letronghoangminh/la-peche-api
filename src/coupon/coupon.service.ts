@@ -3,8 +3,8 @@ import { Prisma } from '@prisma/client';
 import { Role } from 'src/enum/role.enum';
 import { ErrorMessages, genCouponCode } from 'src/helpers/helpers';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateCouponDto, UpdateCouponDto } from './dto/Coupon.dto';
-import { CouponModel } from './model/Coupon.model';
+import { CreateCouponDto, UpdateCouponDto } from './dto/coupon.dto';
+import { CouponModel } from './model/coupon.model';
 
 @Injectable()
 export class CouponService {
