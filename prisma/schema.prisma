@@ -16,7 +16,7 @@ model user {
   verifyAt         DateTime? @db.DateTime(0)
   premiumEndsAt    DateTime? @db.DateTime(0)
   createdAt        DateTime  @default(now()) @db.DateTime(0)
-  updatedAt        DateTime  @updatedAt @db.DateTime(0)
+  updatedAt DateTime @updatedAt @default(now()) @db.DateTime(0)
   introShownFields Json
   lastOnline       DateTime? @db.DateTime(0)
   role             role      @default(USER)
@@ -59,9 +59,9 @@ model user {
 model notification {
   id        Int      @id @default(autoincrement())
   text      String
-  status    String
+  status    notification_status @default(UNREAD)
   createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @db.DateTime(0)
+  updatedAt DateTime @updatedAt @default(now()) @db.DateTime(0)
 
   userId Int
   user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "notification_userId_fk")
@@ -74,7 +74,7 @@ model coupon {
   code            String
   discountPercent Float
   createdAt       DateTime @default(now()) @db.DateTime(0)
-  updatedAt       DateTime @updatedAt @db.DateTime(0)
+  updatedAt DateTime @updatedAt @default(now()) @db.DateTime(0)
 
   userId Int
   user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "coupon_userId_fk")
@@ -87,7 +87,7 @@ model user_image {
   url         String
   isThumbnail Boolean
   createdAt   DateTime @default(now()) @db.DateTime(0)
-  updatedAt   DateTime @updatedAt @db.DateTime(0)
+  updatedAt DateTime @updatedAt @default(now()) @db.DateTime(0)
 
   userId Int
   user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_image_userId_fk")
@@ -100,7 +100,7 @@ model report {
   category  String
   reason    String
   createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @db.DateTime(0)
+  updatedAt DateTime @updatedAt @default(now()) @db.DateTime(0)
 
   reporterId Int
   reporter   user @relation("reports_made", references: [id], fields: [reporterId], onDelete: Cascade, onUpdate: NoAction, map: "report_reporterId_fk")
@@ -112,13 +112,12 @@ model report {
   @@index([targetId], map: "report_targetId_fk")
 }
 
-enum message_types {
-  TEXT
-  VOICE
-  IMAGE
-}
-
 enum role {
   USER
   ADMIN
+}
+
+enum notification_status {
+  READ
+  UNREAD
 }

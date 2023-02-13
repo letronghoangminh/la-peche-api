@@ -16,7 +16,7 @@ export class RegisterDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ type: String, required: true, nullable: false})
+  @ApiProperty({ type: String, required: true, nullable: false })
   name: string;
 
   @IsNotEmpty()

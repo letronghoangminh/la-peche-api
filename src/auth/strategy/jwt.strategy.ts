@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Role } from 'src/helpers/helpers';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Role } from '../enum/role.enum';
 
 @Injectable()
 export class UserStrategy extends PassportStrategy(Strategy, 'user') {
@@ -21,8 +21,7 @@ export class UserStrategy extends PassportStrategy(Strategy, 'user') {
       },
     });
     delete user.hashedPassword;
-    if (user.role === Role.USER || user.role === Role.ADMIN)
-      return user;
+    if (user.role === Role.USER || user.role === Role.ADMIN) return user;
   }
 }
 
@@ -42,7 +41,6 @@ export class AdminStrategy extends PassportStrategy(Strategy, 'admin') {
       },
     });
     delete user.hashedPassword;
-    if (user.role === Role.ADMIN)
-      return user;
+    if (user.role === Role.ADMIN) return user;
   }
 }
