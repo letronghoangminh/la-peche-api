@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import { IsIn } from 'class-validator';
-import { NotificationStatus } from 'src/auth/enum/notification-status.enum';
+import { NotificationStatus } from 'src/enum/notification-status.enum';
 
 export class CreateNotifcationDto {
   @Expose()

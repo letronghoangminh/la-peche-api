@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { NotificationStatus } from 'src/auth/enum/notification-status.enum';
-import { Role } from 'src/auth/enum/role.enum';
+import { NotificationStatus } from 'src/enum/notification-status.enum';
+import { Role } from 'src/enum/role.enum';
 import { ErrorMessages } from 'src/helpers/helpers';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {

@@ -120,4 +120,5 @@ enum role {
 enum notification_status {
   READ
   UNREAD
+  PINNED
 }
