@@ -57,10 +57,12 @@ CREATE TABLE `coupon` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(191) NOT NULL,
     `discountPercent` DOUBLE NOT NULL,
+    `isUsed` BOOLEAN NOT NULL DEFAULT false,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `updatedAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `userId` INTEGER NOT NULL,
 
+    UNIQUE INDEX `coupon_code_key`(`code`),
     INDEX `coupon_userId_fk`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
