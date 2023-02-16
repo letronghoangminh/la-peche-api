@@ -20,12 +20,13 @@ import {
 import { user } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { AdminGuard, UserGuard } from 'src/auth/guard/auth.guard';
+import { NotificationStatus } from 'src/enum/notification-status.enum';
 import { APISummaries } from 'src/helpers/helpers';
 import {
   CreateNotifcationDto,
   UpdateNofiticationDto,
 } from './dto/notification.dto';
-import { NotificationModel } from './model/notification.model';
+import { BaseModel, NotificationModel } from './model/notification.model';
 import { NotificationService } from './notification.service';
 
 type UserType = Pick<user, 'role' | 'id'>;
@@ -100,5 +101,65 @@ export class NotificationController {
     @Body() dto: UpdateNofiticationDto,
   ): Promise<NotificationModel> {
     return this.notificationService.updateNotificationById(id, dto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: NotificationModel })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Put(':id/read')
+  readNotificationById(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: UserType,
+  ): Promise<BaseModel> {
+    return this.notificationService.changeStatusNotificationById(
+      id,
+      {
+        role: user.role,
+        id: user.id,
+      },
+      NotificationStatus.READ,
+    );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: NotificationModel })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Put(':id/pin')
+  pinNotificationById(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: UserType,
+  ): Promise<BaseModel> {
+    return this.notificationService.changeStatusNotificationById(
+      id,
+      {
+        role: user.role,
+        id: user.id,
+      },
+      NotificationStatus.PINNED,
+    );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: NotificationModel })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Put(':id/unread')
+  unreadNotificationById(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: UserType,
+  ): Promise<BaseModel> {
+    return this.notificationService.changeStatusNotificationById(
+      id,
+      {
+        role: user.role,
+        id: user.id,
+      },
+      NotificationStatus.UNREAD,
+    );
   }
 }

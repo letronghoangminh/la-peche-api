@@ -30,6 +30,14 @@ export const ErrorMessages = {
   },
 };
 
+export const Messages = {
+  NOTIFICATION: {
+    NOTI_READ: 'Notification has been changed status to read',
+    NOTI_PINNED: 'Notification has been changed status to pinned',
+    NOTI_UNREAD: 'Notification has been changed status to unread',
+  },
+};
+
 export const APISummaries = {
   UNAUTH: 'No token required',
   USER: 'User permission required',

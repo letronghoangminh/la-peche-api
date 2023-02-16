@@ -32,3 +32,13 @@ export class DeleteNotificationModel {
   @ApiProperty({ type: Number })
   count: number;
 }
+
+export class BaseModel {
+  @Expose()
+  @ApiProperty({ type: Boolean })
+  status: boolean;
+
+  @Expose()
+  @ApiProperty({ type: String })
+  message: string;
+}

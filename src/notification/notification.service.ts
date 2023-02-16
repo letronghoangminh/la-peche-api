@@ -2,13 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { NotificationStatus } from 'src/enum/notification-status.enum';
 import { Role } from 'src/enum/role.enum';
-import { ErrorMessages } from 'src/helpers/helpers';
+import { ErrorMessages, Messages } from 'src/helpers/helpers';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateNotifcationDto,
   UpdateNofiticationDto,
 } from './dto/notification.dto';
-import { NotificationModel } from './model/notification.model';
+import { BaseModel, NotificationModel } from './model/notification.model';
 
 @Injectable()
 export class NotificationService {
@@ -83,6 +83,48 @@ export class NotificationService {
           status: dto.status,
         },
       });
+    } catch (error) {
+      console.log(error.code);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException(
+            ErrorMessages.NOTIFICATION.NOTI_NOT_FOUND,
+          );
+        }
+      }
+      throw error;
+    }
+  }
+
+  async changeStatusNotificationById(
+    id: number,
+    user: { role: string; id: number },
+    status: NotificationStatus,
+  ): Promise<BaseModel> {
+    try {
+      const notification = await this.prismaService.notification.findFirst({
+        where: {
+          id: id,
+          userId: user.id,
+        },
+      });
+
+      if (notification) {
+        await this.prismaService.notification.update({
+          where: {
+            id: id,
+          },
+          data: {
+            status: status,
+          },
+        });
+        return {
+          status: true,
+          message: Messages.NOTIFICATION['NOTI_' + status],
+        };
+      } else {
+        throw new NotFoundException(ErrorMessages.NOTIFICATION.NOTI_NOT_FOUND);
+      }
     } catch (error) {
       console.log(error.code);
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
