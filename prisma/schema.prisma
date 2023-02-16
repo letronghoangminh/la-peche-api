@@ -9,6 +9,7 @@ generator client {
 
 model user {
   id               Int       @id @default(autoincrement())
+  username         String    @unique
   hashedPassword   String
   cluster          Int?
   isActivated      Boolean   @default(true)
@@ -16,7 +17,7 @@ model user {
   verifyAt         DateTime? @db.DateTime(0)
   premiumEndsAt    DateTime? @db.DateTime(0)
   createdAt        DateTime  @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @default(now()) @db.DateTime(0)
+  updatedAt        DateTime  @default(now()) @updatedAt @db.DateTime(0)
   introShownFields Json
   lastOnline       DateTime? @db.DateTime(0)
   role             role      @default(USER)
@@ -54,14 +55,18 @@ model user {
   liking          user[]         @relation("user_likes")
   staredBy        user[]         @relation("user_stars")
   staring         user[]         @relation("user_stars")
+
+  @@index([username])
+  @@index([email])
 }
 
 model notification {
-  id        Int      @id @default(autoincrement())
-  text      String
-  status    notification_status @default(UNREAD)
+  id     Int                 @id @default(autoincrement())
+  text   String
+  status notification_status @default(UNREAD)
+
   createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @updatedAt @db.DateTime(0)
 
   userId Int
   user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "notification_userId_fk")
@@ -70,12 +75,13 @@ model notification {
 }
 
 model coupon {
-  id              Int      @id @default(autoincrement())
-  code            String @unique
+  id              Int     @id @default(autoincrement())
+  code            String  @unique
   discountPercent Float
-  isUsed  Boolean @default(false)
-  createdAt       DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @default(now()) @db.DateTime(0)
+  isUsed          Boolean @default(false)
+
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @updatedAt @db.DateTime(0)
 
   userId Int
   user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "coupon_userId_fk")
@@ -84,11 +90,12 @@ model coupon {
 }
 
 model user_image {
-  id          Int      @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   url         String
   isThumbnail Boolean
-  createdAt   DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @default(now()) @db.DateTime(0)
+
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @updatedAt @db.DateTime(0)
 
   userId Int
   user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_image_userId_fk")
@@ -97,20 +104,22 @@ model user_image {
 }
 
 model report {
-  id        Int      @id @default(autoincrement())
-  category  String
-  reason    String
+  id       Int           @id @default(autoincrement())
+  category String
+  reason   String
+  status   report_status @default(PENDING)
+
   createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @updatedAt @db.DateTime(0)
 
-  reporterId Int
-  reporter   user @relation("reports_made", references: [id], fields: [reporterId], onDelete: Cascade, onUpdate: NoAction, map: "report_reporterId_fk")
+  reporterName String
+  reporter     user   @relation("reports_made", references: [username], fields: [reporterName], onDelete: Cascade, onUpdate: NoAction, map: "report_reporterName_fk")
 
-  targetId Int
-  target   user @relation("reports_received", references: [id], fields: [targetId], onDelete: Cascade, onUpdate: NoAction, map: "report_targetId_fk")
+  targetName String
+  target     user   @relation("reports_received", references: [username], fields: [targetName], onDelete: Cascade, onUpdate: NoAction, map: "report_targetName_fk")
 
-  @@index([reporterId], map: "report_reporterId_fk")
-  @@index([targetId], map: "report_targetId_fk")
+  @@index([reporterName], map: "report_reporterName_fk")
+  @@index([targetName], map: "report_targetName_fk")
 }
 
 enum role {
@@ -122,4 +131,10 @@ enum notification_status {
   READ
   UNREAD
   PINNED
+}
+
+enum report_status {
+  PENDING
+  PROCESSING
+  RESOLVED
 }

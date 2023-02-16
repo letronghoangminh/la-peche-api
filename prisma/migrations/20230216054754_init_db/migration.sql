@@ -1,6 +1,7 @@
 -- CreateTable
 CREATE TABLE `user` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `username` VARCHAR(191) NOT NULL,
     `hashedPassword` VARCHAR(191) NOT NULL,
     `cluster` INTEGER NULL,
     `isActivated` BOOLEAN NOT NULL DEFAULT true,
@@ -35,7 +36,10 @@ CREATE TABLE `user` (
     `smokes` VARCHAR(191) NULL,
     `speaks` VARCHAR(191) NULL,
 
+    UNIQUE INDEX `user_username_key`(`username`),
     UNIQUE INDEX `user_email_key`(`email`),
+    INDEX `user_username_idx`(`username`),
+    INDEX `user_email_idx`(`email`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -85,13 +89,14 @@ CREATE TABLE `report` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `category` VARCHAR(191) NOT NULL,
     `reason` VARCHAR(191) NOT NULL,
+    `status` ENUM('PENDING', 'PROCESSING', 'RESOLVED') NOT NULL DEFAULT 'PENDING',
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `updatedAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `reporterId` INTEGER NOT NULL,
-    `targetId` INTEGER NOT NULL,
+    `reporterName` VARCHAR(191) NOT NULL,
+    `targetName` VARCHAR(191) NOT NULL,
 
-    INDEX `report_reporterId_fk`(`reporterId`),
-    INDEX `report_targetId_fk`(`targetId`),
+    INDEX `report_reporterName_fk`(`reporterName`),
+    INDEX `report_targetName_fk`(`targetName`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -123,10 +128,10 @@ ALTER TABLE `coupon` ADD CONSTRAINT `coupon_userId_fk` FOREIGN KEY (`id`) REFERE
 ALTER TABLE `user_image` ADD CONSTRAINT `user_image_userId_fk` FOREIGN KEY (`id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE `report` ADD CONSTRAINT `report_reporterId_fk` FOREIGN KEY (`reporterId`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE `report` ADD CONSTRAINT `report_reporterName_fk` FOREIGN KEY (`reporterName`) REFERENCES `user`(`username`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE `report` ADD CONSTRAINT `report_targetId_fk` FOREIGN KEY (`targetId`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE `report` ADD CONSTRAINT `report_targetName_fk` FOREIGN KEY (`targetName`) REFERENCES `user`(`username`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE `_user_likes` ADD CONSTRAINT `_user_likes_A_fkey` FOREIGN KEY (`A`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

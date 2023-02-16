@@ -23,6 +23,7 @@ export class AuthService {
       const user = await this.prisma.user.create({
         data: {
           email: dto.email,
+          username: dto.username,
           hashedPassword: hashedPassword,
           introShownFields: introShownFields,
           name: dto.name,
@@ -46,7 +47,7 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: {
-        email: dto.email,
+        username: dto.username,
       },
     });
 
@@ -69,7 +70,7 @@ export class AuthService {
   }
 
   async signToken(user: user): Promise<{ token: string }> {
-    const pickedFields: string[] = ['id', 'email', 'name', 'role'];
+    const pickedFields: string[] = ['id', 'email', 'name', 'role', 'username'];
     const payload = pick(user, pickedFields);
 
     const jwtSecret = this.config.get('JWT_SECRET');

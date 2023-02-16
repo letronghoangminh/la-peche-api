@@ -33,13 +33,13 @@ export class CouponController {
   constructor(private couponService: CouponService) {}
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: APISummaries.ADMIN })
+  @ApiOperation({ summary: APISummaries.USER })
   @ApiOkResponse({ type: CouponModel })
   @ApiBearerAuth()
-  @UseGuards(AdminGuard)
+  @UseGuards(UserGuard)
   @Get()
-  getAllCoupons(): Promise<CouponModel[]> {
-    return this.couponService.getAllCoupons();
+  getAllCoupons(@GetUser() user: UserType): Promise<CouponModel[]> {
+    return this.couponService.getAllCoupons({ role: user.role, id: user.id });
   }
 
   @HttpCode(HttpStatus.OK)
