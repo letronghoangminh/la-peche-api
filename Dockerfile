@@ -5,9 +5,10 @@ COPY package*.json ./
 RUN npm install
 
 COPY prisma ./
-RUN npx prisma generate
 
 COPY . .
+
+RUN npx prisma generate
 
 RUN NODE_OPTIONS="--max-old-space-size=8192" npm run build
 
