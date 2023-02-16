@@ -75,6 +75,7 @@ async function main() {
         isDeleted: false,
         role: 'ADMIN',
         name: name,
+        username: name,
         gender: randomChoice(genders),
         status: randomChoice(statuses),
         orientation: randomChoice(orientations),
@@ -110,6 +111,7 @@ async function main() {
         isDeleted: false,
         role: 'USER',
         name: name,
+        username: name,
         gender: randomChoice(genders),
         status: randomChoice(statuses),
         orientation: randomChoice(orientations),
@@ -158,8 +160,9 @@ async function main() {
     data: {
       category: 'Thang mat day',
       reason: 'Thang mat day',
-      reporterId: 1,
-      targetId: 2,
+      reporterName: 'psycholog1st',
+      targetName: 'chovbeovkieu',
+      status: 'PENDING',
     }
   });
 

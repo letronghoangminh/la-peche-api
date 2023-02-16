@@ -17,7 +17,14 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true, nullable: false })
+  @Matches(/^[a-zA-Z0-9_ ]{6,20}$/)
   name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  @Matches(/^[a-zA-Z0-9_]{6,20}$/)
+  username: string;
 
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true, nullable: false })
@@ -31,10 +38,10 @@ export class RegisterDto {
 }
 
 export class LoginDto {
-  @IsEmail()
+  @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true, nullable: false })
-  email: string;
+  username: string;
 
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true, nullable: false })

@@ -28,6 +28,11 @@ export const ErrorMessages = {
   COUPON: {
     COUPON_NOT_FOUND: 'Coupon not found',
   },
+  REPORT: {
+    REPORT_NOT_FOUND: 'Report not found',
+    USERNAME_INVALID:
+      "The report can't not be created, please verify the target username and reporter username",
+  },
 };
 
 export const Messages = {

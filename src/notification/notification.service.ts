@@ -14,8 +14,17 @@ import { BaseModel, NotificationModel } from './model/notification.model';
 export class NotificationService {
   constructor(private prismaService: PrismaService) {}
 
-  async getAllNotifications(): Promise<NotificationModel[]> {
-    return await this.prismaService.notification.findMany();
+  async getAllNotifications(user: {
+    role: string;
+    id: number;
+  }): Promise<NotificationModel[]> {
+    if (user.role === Role.ADMIN)
+      return await this.prismaService.notification.findMany();
+    return await this.prismaService.notification.findMany({
+      where: {
+        userId: user.id,
+      },
+    });
   }
 
   async getNotificationById(

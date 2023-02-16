@@ -11,8 +11,23 @@ import { CouponModel } from './model/coupon.model';
 export class CouponService {
   constructor(private prismaService: PrismaService) {}
 
-  async getAllCoupons(): Promise<CouponModel[]> {
-    return plainToInstance(CouponModel, await this.prismaService.coupon.findMany());
+  async getAllCoupons(user: {
+    role: string;
+    id: number;
+  }): Promise<CouponModel[]> {
+    if (user.role === Role.ADMIN)
+      return plainToInstance(
+        CouponModel,
+        await this.prismaService.coupon.findMany(),
+      );
+    return plainToInstance(
+      CouponModel,
+      await this.prismaService.coupon.findMany({
+        where: {
+          userId: user.id,
+        },
+      }),
+    );
   }
 
   async getCouponById(

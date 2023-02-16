@@ -37,13 +37,16 @@ export class NotificationController {
   constructor(private notificationService: NotificationService) {}
 
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: APISummaries.ADMIN })
+  @ApiOperation({ summary: APISummaries.USER })
   @ApiOkResponse({ type: NotificationModel })
   @ApiBearerAuth()
-  @UseGuards(AdminGuard)
+  @UseGuards(UserGuard)
   @Get()
-  getAllNotifications(): Promise<NotificationModel[]> {
-    return this.notificationService.getAllNotifications();
+  getAllNotifications(@GetUser() user: UserType): Promise<NotificationModel[]> {
+    return this.notificationService.getAllNotifications({
+      role: user.role,
+      id: user.id,
+    });
   }
 
   @HttpCode(HttpStatus.OK)

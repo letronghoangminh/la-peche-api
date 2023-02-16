@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { NotificationModule } from './notification/notification.module';
 import { CouponModule } from './coupon/coupon.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CouponModule } from './coupon/coupon.module';
     AuthModule,
     NotificationModule,
     CouponModule,
+    ReportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
