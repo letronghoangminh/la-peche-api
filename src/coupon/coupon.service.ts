@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { plainToInstance } from 'class-transformer';
 import { Role } from 'src/enum/role.enum';
 import { ErrorMessages, genCouponCode } from 'src/helpers/helpers';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,7 +12,7 @@ export class CouponService {
   constructor(private prismaService: PrismaService) {}
 
   async getAllCoupons(): Promise<CouponModel[]> {
-    return await this.prismaService.coupon.findMany();
+    return plainToInstance(CouponModel, await this.prismaService.coupon.findMany());
   }
 
   async getCouponById(
@@ -29,7 +30,7 @@ export class CouponService {
     if (!coupon)
       throw new NotFoundException(ErrorMessages.COUPON.COUPON_NOT_FOUND);
 
-    return coupon;
+    return plainToInstance(CouponModel, coupon);
   }
 
   async createCoupon(dto: CreateCouponDto): Promise<CouponModel> {
@@ -54,7 +55,7 @@ export class CouponService {
         code: couponCode,
       },
     });
-    return coupon;
+    return plainToInstance(CouponModel, coupon);
   }
 
   async deleteCouponById(id: number): Promise<{ count: number }> {
@@ -78,7 +79,7 @@ export class CouponService {
     dto: UpdateCouponDto,
   ): Promise<CouponModel> {
     try {
-      return await this.prismaService.coupon.update({
+      const coupon = await this.prismaService.coupon.update({
         where: {
           id: id,
         },
@@ -86,6 +87,7 @@ export class CouponService {
           discountPercent: dto.discountPercent,
         },
       });
+      return plainToInstance(CouponModel, coupon);
     } catch (error) {
       console.log(error.code);
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
