@@ -55,6 +55,8 @@ model user {
   liking          user[]         @relation("user_likes")
   staredBy        user[]         @relation("user_stars")
   staring         user[]         @relation("user_stars")
+  friends         user[]         @relation("user_friends")
+  friendOf        user[]         @relation("user_friends")
 
   @@index([username])
   @@index([email])
