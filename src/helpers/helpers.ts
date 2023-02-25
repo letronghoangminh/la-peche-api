@@ -1,3 +1,5 @@
+import { plainToInstance } from 'class-transformer';
+
 export const introShownFields = {
   yearOfBirth: false,
   bodyType: false,
@@ -33,6 +35,14 @@ export const ErrorMessages = {
     USERNAME_INVALID:
       "The report can't not be created, please verify the target username and reporter username",
   },
+  USER: {
+    USER_NOT_FOUND: 'User not found',
+    USER_LIKED: 'This user has already been liked',
+    USER_INVALID: 'User invalid',
+    USER_STARRED: 'This user has already been starred',
+    USER_INACTIVE: 'Please activate this user first',
+    USER_IMAGE_NOT_EXIST: 'Image not found',
+  },
 };
 
 export const Messages = {
@@ -40,6 +50,10 @@ export const Messages = {
     NOTI_READ: 'Notification has been changed status to read',
     NOTI_PINNED: 'Notification has been changed status to pinned',
     NOTI_UNREAD: 'Notification has been changed status to unread',
+  },
+  USER: {
+    USER_LIKED: 'This user has been liked',
+    USER_STARRED: 'This user has been starred',
   },
 };
 
@@ -60,4 +74,12 @@ export function genCouponCode(length = 6): string {
     counter += 1;
   }
   return coupon;
+}
+
+export function PlainToInstance(model: any, response: any): any {
+  return plainToInstance(model, response, {
+    excludeExtraneousValues: true,
+    enableImplicitConversion: true,
+    strategy: 'excludeAll',
+  });
 }

@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { NotificationModule } from './notification/notification.module';
 import { CouponModule } from './coupon/coupon.module';
 import { ReportModule } from './report/report.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ReportModule } from './report/report.module';
     NotificationModule,
     CouponModule,
     ReportModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

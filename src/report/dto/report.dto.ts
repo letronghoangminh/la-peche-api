@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { IsIn, IsInt, IsString } from 'class-validator';
+import { IsIn, IsString } from 'class-validator';
 import { ReportStatus } from 'src/enum/report-status.enum';
 
 export class ReportDto {
@@ -26,11 +26,6 @@ export class ReportDto {
 }
 
 export class HandleReportDto {
-  @IsInt()
-  @Expose()
-  @ApiProperty({ type: Number, nullable: false, required: true })
-  id: number;
-
   @Expose()
   @IsString()
   @ApiProperty({ type: String, nullable: false, required: true })
