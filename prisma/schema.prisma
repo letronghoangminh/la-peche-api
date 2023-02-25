@@ -55,11 +55,26 @@ model user {
   liking          user[]         @relation("user_likes")
   staredBy        user[]         @relation("user_stars")
   staring         user[]         @relation("user_stars")
-  friends         user[]         @relation("user_friends")
-  friendOf        user[]         @relation("user_friends")
+  firstMatch      match[]        @relation("first_user")
+  secondMatch     match[]        @relation("second_user")
 
   @@index([username])
   @@index([email])
+}
+
+model match {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @updatedAt @db.DateTime(0)
+
+  firstUsername String
+  firstUser     user   @relation("first_user", fields: [firstUsername], references: [username], onDelete: Cascade, onUpdate: NoAction, map: "match_firstUsername_fk")
+
+  secondUsername String
+  secondUser     user   @relation("second_user", fields: [firstUsername], references: [username], onDelete: Cascade, onUpdate: NoAction, map: "match_secondUsername_fk")
+
+  @@index([firstUsername], map: "match_firstUsername_fk")
+  @@index([secondUsername], map: "match_secondUsername_fk")
 }
 
 model notification {

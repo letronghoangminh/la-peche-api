@@ -90,17 +90,17 @@ export class ReportService {
     }
   }
 
-  async handleReport(dto: HandleReportDto): Promise<ReportModel> {
+  async handleReport(id: number, dto: HandleReportDto): Promise<ReportModel> {
     const report = await this.prismaService.report.findFirst({
       where: {
-        id: dto.id,
+        id: id,
       },
     });
 
     if (report) {
       return await this.prismaService.report.update({
         where: {
-          id: dto.id,
+          id: id,
         },
         data: {
           reason: dto.reason,

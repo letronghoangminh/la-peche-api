@@ -15,11 +15,15 @@ export class UserStrategy extends PassportStrategy(Strategy, 'user') {
   }
 
   async validate(payload: { email: string }) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findFirst({
       where: {
         email: payload.email,
+        isDeleted: false,
       },
     });
+
+    if (!user) return null;
+
     delete user.hashedPassword;
     if (user.role === Role.USER || user.role === Role.ADMIN) return user;
   }
@@ -35,11 +39,15 @@ export class AdminStrategy extends PassportStrategy(Strategy, 'admin') {
   }
 
   async validate(payload: { email: string }) {
-    const user = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findFirst({
       where: {
         email: payload.email,
+        isDeleted: false,
       },
     });
+
+    if (!user) return null;
+
     delete user.hashedPassword;
     if (user.role === Role.ADMIN) return user;
   }

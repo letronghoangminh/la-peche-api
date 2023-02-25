@@ -44,6 +44,19 @@ CREATE TABLE `user` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `match` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `updatedAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `firstUsername` VARCHAR(191) NOT NULL,
+    `secondUsername` VARCHAR(191) NOT NULL,
+
+    INDEX `match_firstUsername_fk`(`firstUsername`),
+    INDEX `match_secondUsername_fk`(`secondUsername`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `notification` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `text` VARCHAR(191) NOT NULL,
@@ -118,14 +131,11 @@ CREATE TABLE `_user_stars` (
     INDEX `_user_stars_B_index`(`B`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CreateTable
-CREATE TABLE `_user_friends` (
-    `A` INTEGER NOT NULL,
-    `B` INTEGER NOT NULL,
+-- AddForeignKey
+ALTER TABLE `match` ADD CONSTRAINT `match_firstUsername_fk` FOREIGN KEY (`firstUsername`) REFERENCES `user`(`username`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
-    UNIQUE INDEX `_user_friends_AB_unique`(`A`, `B`),
-    INDEX `_user_friends_B_index`(`B`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- AddForeignKey
+ALTER TABLE `match` ADD CONSTRAINT `match_secondUsername_fk` FOREIGN KEY (`firstUsername`) REFERENCES `user`(`username`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE `notification` ADD CONSTRAINT `notification_userId_fk` FOREIGN KEY (`id`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
@@ -153,9 +163,3 @@ ALTER TABLE `_user_stars` ADD CONSTRAINT `_user_stars_A_fkey` FOREIGN KEY (`A`) 
 
 -- AddForeignKey
 ALTER TABLE `_user_stars` ADD CONSTRAINT `_user_stars_B_fkey` FOREIGN KEY (`B`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `_user_friends` ADD CONSTRAINT `_user_friends_A_fkey` FOREIGN KEY (`A`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `_user_friends` ADD CONSTRAINT `_user_friends_B_fkey` FOREIGN KEY (`B`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

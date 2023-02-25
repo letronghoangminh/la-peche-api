@@ -5,10 +5,10 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   ParseIntPipe,
   Post,
   Put,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -52,7 +52,7 @@ export class ReportController {
   @UseGuards(UserGuard)
   @Get(':id')
   getReportById(
-    @Query('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @GetUser() user: UserType,
   ): Promise<ReportModel> {
     return this.reportService.getReportById(id, {
@@ -85,8 +85,11 @@ export class ReportController {
   @ApiBearerAuth()
   @UseGuards(AdminGuard)
   @Put(':id')
-  handleReport(@Body() dto: HandleReportDto): Promise<ReportModel> {
-    return this.reportService.handleReport(dto);
+  handleReport(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: HandleReportDto,
+  ): Promise<ReportModel> {
+    return this.reportService.handleReport(id, dto);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -96,7 +99,7 @@ export class ReportController {
   @UseGuards(AdminGuard)
   @Delete(':id')
   deleteReportById(
-    @Query('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<ReportModel> {
     return this.reportService.deleteReportById(id);
   }
