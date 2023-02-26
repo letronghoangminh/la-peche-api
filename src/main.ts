@@ -20,7 +20,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 
   SwaggerModule.setup(
-    `v1/${configService.get('swagger.docsUrl')}`,
+    `api/${configService.get('swagger.docsUrl')}`,
     app,
     document,
   );
