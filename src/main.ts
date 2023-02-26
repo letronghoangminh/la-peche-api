@@ -6,7 +6,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('v1');
+  app.setGlobalPrefix('api');
   const configService = app.get(ConfigService);
 
   const swaggerConfig = new DocumentBuilder()
