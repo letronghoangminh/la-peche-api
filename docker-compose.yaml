@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+    ports:
+      - 3306:3306
+
+  api: 
+    image: psycholog1st/la-peche-api
+    depends_on:
+      - db
+    ports: 
+      - 3000:3000
+    env_file: ./.env.example
+    entrypoint: ["bash", "-c", "npx prisma migrate deploy && npx prisma db seed && npm run start:prod"]      
