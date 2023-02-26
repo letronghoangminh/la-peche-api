@@ -16,4 +16,4 @@ services:
     ports: 
       - 3000:3000
     env_file: ./.env.example
-    entrypoint: ["bash", "-c", "npx prisma migrate deploy && npx prisma db seed && npm run start:prod"]      
+    entrypoint: ["bash", "-c", "npx prisma migrate deploy && npx ts-node prisma/seed.ts && npm run start:prod"]      
