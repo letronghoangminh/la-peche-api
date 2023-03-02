@@ -63,17 +63,17 @@ export const APISummaries = {
   ADMIN: 'Admin permission required',
 };
 
-export function genCouponCode(length = 6): string {
-  let coupon = '';
+export function genRandomString(length = 6): string {
+  let random = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   const charactersLength: number = characters.length;
   let counter = 0;
 
   while (counter < length) {
-    coupon += characters.charAt(Math.floor(Math.random() * charactersLength));
+    random += characters.charAt(Math.floor(Math.random() * charactersLength));
     counter += 1;
   }
-  return coupon;
+  return random;
 }
 
 export function PlainToInstance(model: any, response: any): any {

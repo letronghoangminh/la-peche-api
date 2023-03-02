@@ -6,6 +6,8 @@ CREATE TABLE `user` (
     `cluster` INTEGER NULL,
     `isActivated` BOOLEAN NOT NULL DEFAULT true,
     `isDeleted` BOOLEAN NOT NULL DEFAULT false,
+    `isVerified` BOOLEAN NOT NULL DEFAULT false,
+    `verifyToken` VARCHAR(191) NULL,
     `verifyAt` DATETIME(0) NULL,
     `premiumEndsAt` DATETIME(0) NULL,
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),

@@ -1,9 +1,23 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { user } from '@prisma/client';
 import { APISummaries } from 'src/helpers/helpers';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { GetUser } from './decorator/get-user.decorator';
+import { LoginDto, RegisterDto, VerifyUserDto } from './dto/auth.dto';
+import { UserGuard } from './guard/auth.guard';
 import { AuthModel } from './model/auth.model';
+
+type UserType = Pick<user, 'role' | 'id' | 'username' | 'email'>;
 
 @Controller('auth')
 @ApiTags('AUTH')
@@ -24,5 +38,17 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authSerivce.login(dto);
+  }
+
+  @ApiOperation({ summary: APISummaries.USER })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: String })
+  @UseGuards(UserGuard)
+  @Get('verify')
+  verify(@Query() query: VerifyUserDto, @GetUser() user: UserType) {
+    return this.authSerivce.verify(query, {
+      email: user.email,
+      username: user.username,
+    });
   }
 }

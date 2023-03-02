@@ -19,6 +19,7 @@ export class UserStrategy extends PassportStrategy(Strategy, 'user') {
       where: {
         email: payload.email,
         isDeleted: false,
+        isActivated: true,
       },
     });
 
@@ -43,6 +44,7 @@ export class AdminStrategy extends PassportStrategy(Strategy, 'admin') {
       where: {
         email: payload.email,
         isDeleted: false,
+        isActivated: true,
       },
     });
 

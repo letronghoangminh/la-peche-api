@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
 import { Role } from 'src/enum/role.enum';
-import { ErrorMessages, genCouponCode } from 'src/helpers/helpers';
+import { ErrorMessages, genRandomString } from 'src/helpers/helpers';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCouponDto, UpdateCouponDto } from './dto/coupon.dto';
 import { CouponModel } from './model/coupon.model';
@@ -52,7 +52,7 @@ export class CouponService {
     let couponCode: string;
 
     while (true) {
-      couponCode = genCouponCode();
+      couponCode = genRandomString();
 
       const existedCoupon = await this.prismaService.coupon.findFirst({
         where: {

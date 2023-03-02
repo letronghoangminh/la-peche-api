@@ -1,11 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { LoginDto, RegisterDto, VerifyUserDto } from './dto/auth.dto';
 import * as argon from 'argon2';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma, user } from '@prisma/client';
-import { introShownFields } from 'src/helpers/helpers';
+import { genRandomString, introShownFields } from 'src/helpers/helpers';
 import { pick } from 'lodash';
 import { ErrorMessages } from 'src/helpers/helpers';
 
@@ -30,6 +30,7 @@ export class AuthService {
           gender: '',
           status: '',
           orientation: '',
+          verifyToken: genRandomString(20),
         },
       });
 
@@ -67,6 +68,39 @@ export class AuthService {
       throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
 
     return this.signToken(user);
+  }
+
+  async verify(
+    query: VerifyUserDto,
+    options: {
+      email: string;
+      username: string;
+    },
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username: options.username,
+      },
+      select: {
+        verifyToken: true,
+      },
+    });
+
+    if (query.token === user.verifyToken) {
+      await this.prisma.user.update({
+        where: {
+          username: options.username,
+        },
+        data: {
+          isVerified: true,
+          verifyAt: new Date(),
+        },
+      });
+
+      return 'User verified successfully';
+    }
+
+    return 'Verify user failed';
   }
 
   async signToken(user: user): Promise<{ token: string }> {

@@ -14,6 +14,8 @@ model user {
   cluster          Int?
   isActivated      Boolean   @default(true)
   isDeleted        Boolean   @default(false)
+  isVerified        Boolean   @default(false)
+  verifyToken      String?    
   verifyAt         DateTime? @db.DateTime(0)
   premiumEndsAt    DateTime? @db.DateTime(0)
   createdAt        DateTime  @default(now()) @db.DateTime(0)

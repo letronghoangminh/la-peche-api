@@ -9,6 +9,7 @@ import { NotificationModule } from './notification/notification.module';
 import { CouponModule } from './coupon/coupon.module';
 import { ReportModule } from './report/report.module';
 import { UserModule } from './user/user.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserModule } from './user/user.module';
     CouponModule,
     ReportModule,
     UserModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

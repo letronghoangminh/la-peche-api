@@ -1,26 +1,30 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Role } from 'src/enum/role.enum';
 import { ErrorMessages, Messages, PlainToInstance } from 'src/helpers/helpers';
+import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateImageDto, UpdateImageDto, UpdateUserDto } from './dto/user.dto';
 import { ImageModel, UserModel } from './model/user.model';
 
 @Injectable()
 export class UserService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private mailService: MailService,
+  ) {}
 
-  private async checkActivatedUser(username: string): Promise<boolean> {
+  private async checkVerifiedUser(username: string): Promise<boolean> {
     const user = await this.prismaService.user.findFirst({
       where: {
         username: username,
         isDeleted: false,
       },
       select: {
-        isActivated: true,
+        isVerified: true,
       },
     });
 
-    return user.isActivated;
+    return user.isVerified;
   }
 
   async getAllUsers(): Promise<UserModel[]> {
@@ -127,7 +131,7 @@ export class UserService {
       username: string;
     },
   ): Promise<string> {
-    if (!this.checkActivatedUser(user.username))
+    if (!this.checkVerifiedUser(user.username))
       throw new BadRequestException(ErrorMessages.USER.USER_INACTIVE);
 
     if (username === user.username)
@@ -202,7 +206,7 @@ export class UserService {
       username: string;
     },
   ): Promise<string> {
-    if (!this.checkActivatedUser(user.username))
+    if (!this.checkVerifiedUser(user.username))
       throw new BadRequestException(ErrorMessages.USER.USER_INACTIVE);
 
     if (username === user.username)
@@ -346,5 +350,24 @@ export class UserService {
     });
 
     return PlainToInstance(ImageModel, userImage);
+  }
+
+  async verifyUser(user: { email: string; username: string }): Promise<string> {
+    const existedUser = await this.prismaService.user.findFirst({
+      where: {
+        username: user.username,
+      },
+      select: {
+        name: true,
+        verifyToken: true,
+      },
+    });
+
+    this.mailService.sendEmailConfirmation(
+      { email: user.email, name: existedUser.name },
+      existedUser.verifyToken,
+    );
+
+    return 'Verification email sended';
   }
 }

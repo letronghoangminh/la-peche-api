@@ -21,11 +21,17 @@ import { user } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { AdminGuard, UserGuard } from 'src/auth/guard/auth.guard';
 import { APISummaries } from 'src/helpers/helpers';
-import { CreateImageDto, UpdateImageDto, UpdateUserDto } from './dto/user.dto';
+import {
+  CreateImageDto,
+  LikeUserDto,
+  StarUserDto,
+  UpdateImageDto,
+  UpdateUserDto,
+} from './dto/user.dto';
 import { ImageModel, UserModel } from './model/user.model';
 import { UserService } from './user.service';
 
-type UserType = Pick<user, 'role' | 'id' | 'username'>;
+type UserType = Pick<user, 'role' | 'id' | 'username' | 'email'>;
 
 @ApiTags('USER')
 @Controller('users')
@@ -96,12 +102,12 @@ export class UserController {
   @ApiOkResponse({ type: String })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
-  @Post(':username/like')
+  @Post('like')
   likeUser(
-    @Param('username') username: string,
+    @Body() dto: LikeUserDto,
     @GetUser() user: UserType,
   ): Promise<string> {
-    return this.userService.likeUser(username, {
+    return this.userService.likeUser(dto.username, {
       role: user.role,
       username: user.username,
     });
@@ -112,13 +118,26 @@ export class UserController {
   @ApiOkResponse({ type: String })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
-  @Post(':username/star')
+  @Post('star')
   starUser(
-    @Param('username') username: string,
+    @Body() dto: StarUserDto,
     @GetUser() user: UserType,
   ): Promise<string> {
-    return this.userService.starUser(username, {
+    return this.userService.starUser(dto.username, {
       role: user.role,
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: String })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Post('verify')
+  verifyUser(@GetUser() user: UserType): Promise<string> {
+    return this.userService.verifyUser({
+      email: user.email,
       username: user.username,
     });
   }

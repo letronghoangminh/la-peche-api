@@ -48,3 +48,10 @@ export class LoginDto {
   @IsString()
   password: string;
 }
+
+export class VerifyUserDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  token: string;
+}

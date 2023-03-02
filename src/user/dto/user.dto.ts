@@ -135,3 +135,11 @@ export class UpdateImageDto {
   @ApiProperty({ type: Boolean, required: true, nullable: false })
   isThumbnail: boolean;
 }
+
+export class LikeUserDto {
+  @IsString()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  username: string;
+}
+
+export class StarUserDto extends LikeUserDto {}
