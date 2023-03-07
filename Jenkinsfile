@@ -66,7 +66,7 @@ pipeline {
         sh """
             cp .env.example .env
 
-            sed -i "/^ENVIRONMENT=/c ENVIRONMENT=production" .env
+            sed -i "/^APP_ENV=/c APP_ENV=production" .env
             sed -i "/^ROOT_API=/c ROOT_API=https://lapeche.date/api" .env
             sed -i "/^MAIL_FROM=/c MAIL_FROM=${MAIL_FROM}" .env
             sed -i "/^MAIL_USERNAME=/c MAIL_USERNAME=${MAIL_USERNAME}" .env
@@ -87,7 +87,7 @@ pipeline {
     stage('Deploy') {
       steps {
         sh """
-          docker service update --image=${DOCKER_IMAGE}:latest lapeche_api
+          docker service update --image=${DOCKER_IMAGE}:${DOCKER_TAG_BUILD} lapeche_api
         """
       }
     }
