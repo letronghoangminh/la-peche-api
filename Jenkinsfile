@@ -11,10 +11,10 @@ pipeline {
   }
 
   environment {
-      TIMESTAMP = """${sh(
-				returnStdout: true,
-				script: 'date --utc +%Y%m%d_%H%M%SZ'
-				).trim()}"""
+    TIMESTAMP = """${sh(
+      returnStdout: true,
+      script: 'date --utc +%Y%m%d_%H%M%SZ'
+      ).trim()}"""
     JWT_SECRET = credentials('JWT_SECRET')
     MAIL_USERNAME = credentials('MAIL_USERNAME')
     MAIL_PASSWORD = credentials('MAIL_PASSWORD')
@@ -73,8 +73,6 @@ pipeline {
             sed -i "/^MAIL_PASSWORD=/c MAIL_PASSWORD=${MAIL_PASSWORD}" .env
             sed -i "/^MAIL_HOST=/c MAIL_HOST=${MAIL_HOST}" .env
             sed -i "/^JWT_SECRET=/c JWT_SECRET=${JWT_SECRET}" .env
-
-            cat .env
 
             docker login ${DOCKER_REGISTRY} --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
             docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG_BUILD} -t ${DOCKER_IMAGE}:latest .
