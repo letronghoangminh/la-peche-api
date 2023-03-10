@@ -22,6 +22,7 @@ pipeline {
     MAIL_FROM = credentials('MAIL_FROM')
     DOCKER_USERNAME = credentials('DOCKER_USERNAME')
     DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
+    NEW_RELIC_LICENSE_KEY = credentials('NEW_RELIC_LICENSE_KEY')
   }
 
   parameters {
@@ -75,7 +76,7 @@ pipeline {
             sed -i "/^JWT_SECRET=/c JWT_SECRET=${JWT_SECRET}" .env
 
             docker login ${DOCKER_REGISTRY} --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
-            docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG_BUILD} -t ${DOCKER_IMAGE}:latest .
+            docker build --build-arg NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY} -t ${DOCKER_IMAGE}:${DOCKER_TAG_BUILD} -t ${DOCKER_IMAGE}:latest .
             docker push ${DOCKER_IMAGE}:${DOCKER_TAG_BUILD}
             docker push ${DOCKER_IMAGE}:latest
         """
