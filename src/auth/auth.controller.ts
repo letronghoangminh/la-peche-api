@@ -8,7 +8,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { user } from '@prisma/client';
 import { APISummaries } from 'src/helpers/helpers';
 import { AuthService } from './auth.service';
@@ -43,6 +43,7 @@ export class AuthController {
   @ApiOperation({ summary: APISummaries.USER })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: String })
+  @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('verify')
   verify(@Query() query: VerifyUserDto, @GetUser() user: UserType) {
