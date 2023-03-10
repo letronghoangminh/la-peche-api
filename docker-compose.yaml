@@ -7,7 +7,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: toor
     ports:
-      - 3306:3306
+      - 3307:3306
 
   api: 
     image: psycholog1st/la-peche-api
