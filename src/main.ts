@@ -14,7 +14,7 @@ async function bootstrap() {
     .setTitle('La Pêche API')
     .setDescription('La Pêche API Documentation')
     .setVersion('1.0')
-    .setContact('LaPeche', 'https://lapeche.date', 'letronghoangminh@gmail.com')
+    .setContact('LaPeche', 'https://lapeche.date', 'lapeche.date@gmail.com')
     .addBearerAuth()
     .build();
 
