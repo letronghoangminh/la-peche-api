@@ -47,6 +47,7 @@ model user {
   sign        String?
   smokes      String?
   speaks      String?
+  phoneNumber String?
 
   notifications   notification[]
   coupons         coupon[]

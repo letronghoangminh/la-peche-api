@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
-import { Expose, Transform } from 'class-transformer';
+import { Expose } from 'class-transformer';
 import { Role } from 'src/enum/role.enum';
 
 export class UserModel {
@@ -39,10 +38,6 @@ export class UserModel {
   @Expose()
   @ApiProperty({ type: Date })
   updatedAt: Date;
-
-  @Expose()
-  @Transform(({ obj }) => obj.introShownFields)
-  introShownFields: Prisma.JsonValue;
 
   @Expose()
   @ApiProperty({ type: Date })

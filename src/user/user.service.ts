@@ -1,6 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Role } from 'src/enum/role.enum';
-import { ErrorMessages, Messages, PlainToInstance } from 'src/helpers/helpers';
+import {
+  ErrorMessages,
+  Messages,
+  PlainToInstance,
+  sensitiveFields,
+} from 'src/helpers/helpers';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateImageDto, UpdateImageDto, UpdateUserDto } from './dto/user.dto';
@@ -44,22 +49,43 @@ export class UserService {
       username: string;
     },
   ): Promise<UserModel> {
-    const condition = {
-      isDeleted: false,
-    };
-
+    let result: UserModel;
     if (
       (user.role === Role.USER && username === user.username) ||
-      (user.role === Role.ADMIN && username)
-    )
-      condition['username'] = username;
-    else throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
+      user.role === Role.ADMIN
+    ) {
+      const user = await this.prismaService.user.findFirst({
+        where: {
+          username: username,
+          isDeleted: false,
+        },
+      });
 
-    const result = await this.prismaService.user.findFirst({
-      where: condition,
-    });
+      result = PlainToInstance(UserModel, user);
+    } else {
+      const user = await this.prismaService.user.findFirst({
+        where: {
+          username: username,
+          isDeleted: false,
+        },
+      });
 
-    return PlainToInstance(UserModel, result);
+      if (user) {
+        for (const [key, value] of Object.entries(user.introShownFields)) {
+          if (!value) delete user[key];
+        }
+
+        sensitiveFields.map((field) => {
+          delete user[field];
+        });
+      }
+
+      result = PlainToInstance(UserModel, user);
+    }
+
+    if (!result) throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
+
+    return result;
   }
 
   async updateUser(
