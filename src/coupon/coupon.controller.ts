@@ -9,7 +9,9 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -24,6 +26,7 @@ import { APISummaries } from 'src/helpers/helpers';
 import { CreateCouponDto, UpdateCouponDto } from './dto/coupon.dto';
 import { CouponModel } from './model/coupon.model';
 import { CouponService } from './coupon.service';
+import { PageDto } from 'src/prisma/helper/prisma.helper';
 
 type UserType = Pick<user, 'role' | 'id'>;
 
@@ -38,8 +41,14 @@ export class CouponController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get()
-  getAllCoupons(@GetUser() user: UserType): Promise<CouponModel[]> {
-    return this.couponService.getAllCoupons({ role: user.role, id: user.id });
+  getAllCoupons(
+    @Query(new ValidationPipe({ transform: true })) query: PageDto,
+    @GetUser() user: UserType,
+  ): Promise<CouponModel[]> {
+    return this.couponService.getAllCoupons(query, {
+      role: user.role,
+      id: user.id,
+    });
   }
 
   @HttpCode(HttpStatus.OK)

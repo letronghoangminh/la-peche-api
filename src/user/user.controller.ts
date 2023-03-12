@@ -9,7 +9,9 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -21,6 +23,7 @@ import { user } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { AdminGuard, UserGuard } from 'src/auth/guard/auth.guard';
 import { APISummaries } from 'src/helpers/helpers';
+import { PageDto } from 'src/prisma/helper/prisma.helper';
 import {
   CreateImageDto,
   LikeUserDto,
@@ -45,8 +48,10 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(AdminGuard)
   @Get()
-  getAllUsers(): Promise<UserModel[]> {
-    return this.userService.getAllUsers();
+  getAllUsers(
+    @Query(new ValidationPipe({ transform: true })) query: PageDto,
+  ): Promise<UserModel[]> {
+    return this.userService.getAllUsers(query);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -55,8 +60,11 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('images')
-  getAllImages(@GetUser() user: UserType): Promise<ImageModel[]> {
-    return this.userService.getAllImages({
+  getAllImages(
+    @Query(new ValidationPipe({ transform: true })) query: PageDto,
+    @GetUser() user: UserType,
+  ): Promise<ImageModel[]> {
+    return this.userService.getAllImages(query, {
       role: user.role,
       username: user.username,
       userId: user.id,
@@ -227,8 +235,11 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('liked')
-  getLikedUsers(@GetUser() user: UserType): Promise<UserModel[]> {
-    return this.userService.getLikedUsers({
+  getLikedUsers(
+    @Query(new ValidationPipe({ transform: true })) query: PageDto,
+    @GetUser() user: UserType,
+  ): Promise<UserModel[]> {
+    return this.userService.getLikedUsers(query, {
       username: user.username,
     });
   }
@@ -239,8 +250,11 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('starred')
-  getStarredUsers(@GetUser() user: UserType): Promise<UserModel[]> {
-    return this.userService.getStarredUsers({
+  getStarredUsers(
+    @Query(new ValidationPipe({ transform: true })) query: PageDto,
+    @GetUser() user: UserType,
+  ): Promise<UserModel[]> {
+    return this.userService.getStarredUsers(query, {
       username: user.username,
     });
   }
@@ -251,8 +265,11 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('skipped')
-  getSkippedUsers(@GetUser() user: UserType): Promise<UserModel[]> {
-    return this.userService.getSkippedUsers({
+  getSkippedUsers(
+    @Query(new ValidationPipe({ transform: true })) query: PageDto,
+    @GetUser() user: UserType,
+  ): Promise<UserModel[]> {
+    return this.userService.getSkippedUsers(query, {
       username: user.username,
     });
   }
@@ -263,8 +280,11 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('matched')
-  getMatchedUsers(@GetUser() user: UserType): Promise<UserModel[]> {
-    return this.userService.getMatchedUsers({
+  getMatchedUsers(
+    @Query(new ValidationPipe({ transform: true })) query: PageDto,
+    @GetUser() user: UserType,
+  ): Promise<UserModel[]> {
+    return this.userService.getMatchedUsers(query, {
       username: user.username,
     });
   }
@@ -275,8 +295,11 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('recommended')
-  getRecommendedUsers(@GetUser() user: UserType): Promise<UserModel[]> {
-    return this.userService.getRecommendedUsers({
+  getRecommendedUsers(
+    @Query(new ValidationPipe({ transform: true })) query: PageDto,
+    @GetUser() user: UserType,
+  ): Promise<UserModel[]> {
+    return this.userService.getRecommendedUsers(query, {
       username: user.username,
     });
   }

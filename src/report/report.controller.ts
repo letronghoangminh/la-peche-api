@@ -9,7 +9,9 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -21,6 +23,7 @@ import { user } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { AdminGuard, UserGuard } from 'src/auth/guard/auth.guard';
 import { APISummaries } from 'src/helpers/helpers';
+import { PageDto } from 'src/prisma/helper/prisma.helper';
 import { HandleReportDto, ReportDto } from './dto/report.dto';
 import { ReportModel } from './model/report.model';
 import { ReportService } from './report.service';
@@ -38,8 +41,11 @@ export class ReportController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get()
-  getAllReports(@GetUser() user: UserType): Promise<ReportModel[]> {
-    return this.reportService.getAllReports({
+  getAllReports(
+    @Query(new ValidationPipe({ transform: true })) query: PageDto,
+    @GetUser() user: UserType,
+  ): Promise<ReportModel[]> {
+    return this.reportService.getAllReports(query, {
       role: user.role,
       username: user.username,
     });

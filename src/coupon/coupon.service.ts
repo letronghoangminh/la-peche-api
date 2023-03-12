@@ -2,7 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
 import { Role } from 'src/enum/role.enum';
-import { ErrorMessages, genRandomString } from 'src/helpers/helpers';
+import {
+  ErrorMessages,
+  genRandomString,
+  PlainToInstance,
+} from 'src/helpers/helpers';
+import { PageDto, PaginationHandle } from 'src/prisma/helper/prisma.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCouponDto, UpdateCouponDto } from './dto/coupon.dto';
 import { CouponModel } from './model/coupon.model';
@@ -11,23 +16,24 @@ import { CouponModel } from './model/coupon.model';
 export class CouponService {
   constructor(private prismaService: PrismaService) {}
 
-  async getAllCoupons(user: {
-    role: string;
-    id: number;
-  }): Promise<CouponModel[]> {
-    if (user.role === Role.ADMIN)
-      return plainToInstance(
-        CouponModel,
-        await this.prismaService.coupon.findMany(),
-      );
-    return plainToInstance(
-      CouponModel,
-      await this.prismaService.coupon.findMany({
-        where: {
-          userId: user.id,
-        },
-      }),
-    );
+  async getAllCoupons(
+    query: PageDto,
+    user: {
+      role: string;
+      id: number;
+    },
+  ): Promise<CouponModel[]> {
+    const dbQuery = {};
+
+    if (!(user.role === Role.ADMIN))
+      dbQuery['where'] = {
+        userId: user.id,
+      };
+
+    PaginationHandle(dbQuery, query.page, query.pageSize);
+    const coupons = await this.prismaService.coupon.findMany(dbQuery);
+
+    return PlainToInstance(CouponModel, coupons);
   }
 
   async getCouponById(
