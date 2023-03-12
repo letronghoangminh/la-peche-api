@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { NotificationStatus } from 'src/enum/notification-status.enum';
 import { Role } from 'src/enum/role.enum';
 import { ErrorMessages, Messages } from 'src/helpers/helpers';
+import { PageDto, PaginationHandle } from 'src/prisma/helper/prisma.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateNotifcationDto,
@@ -14,17 +15,22 @@ import { BaseModel, NotificationModel } from './model/notification.model';
 export class NotificationService {
   constructor(private prismaService: PrismaService) {}
 
-  async getAllNotifications(user: {
-    role: string;
-    id: number;
-  }): Promise<NotificationModel[]> {
-    if (user.role === Role.ADMIN)
-      return await this.prismaService.notification.findMany();
-    return await this.prismaService.notification.findMany({
-      where: {
+  async getAllNotifications(
+    query: PageDto,
+    user: {
+      role: string;
+      id: number;
+    },
+  ): Promise<NotificationModel[]> {
+    const dbQuery = {};
+
+    if (!(user.role === Role.ADMIN))
+      dbQuery['where'] = {
         userId: user.id,
-      },
-    });
+      };
+
+    PaginationHandle(dbQuery, query.page, query.pageSize);
+    return await this.prismaService.notification.findMany(dbQuery);
   }
 
   async getNotificationById(

@@ -6,6 +6,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { Role } from 'src/enum/role.enum';
 import { ErrorMessages } from 'src/helpers/helpers';
+import { PageDto, PaginationHandle } from 'src/prisma/helper/prisma.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { HandleReportDto, ReportDto } from './dto/report.dto';
 import { ReportModel } from './model/report.model';
@@ -14,17 +15,21 @@ import { ReportModel } from './model/report.model';
 export class ReportService {
   constructor(private prismaService: PrismaService) {}
 
-  async getAllReports(user: {
-    role: string;
-    username: string;
-  }): Promise<ReportModel[]> {
-    if (user.role === Role.ADMIN)
-      return await this.prismaService.report.findMany();
-    return await this.prismaService.report.findMany({
-      where: {
+  async getAllReports(
+    query: PageDto,
+    user: {
+      role: string;
+      username: string;
+    },
+  ): Promise<ReportModel[]> {
+    const dbQuery = {};
+    if (!(user.role === Role.ADMIN))
+      dbQuery['where'] = {
         reporterName: user.username,
-      },
-    });
+      };
+
+    PaginationHandle(dbQuery, query.page, query.pageSize);
+    return await this.prismaService.report.findMany(dbQuery);
   }
 
   async getReportById(

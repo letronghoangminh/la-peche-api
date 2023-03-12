@@ -9,7 +9,9 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -22,6 +24,7 @@ import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { AdminGuard, UserGuard } from 'src/auth/guard/auth.guard';
 import { NotificationStatus } from 'src/enum/notification-status.enum';
 import { APISummaries } from 'src/helpers/helpers';
+import { PageDto } from 'src/prisma/helper/prisma.helper';
 import {
   CreateNotifcationDto,
   UpdateNofiticationDto,
@@ -42,8 +45,11 @@ export class NotificationController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get()
-  getAllNotifications(@GetUser() user: UserType): Promise<NotificationModel[]> {
-    return this.notificationService.getAllNotifications({
+  getAllNotifications(
+    @Query(new ValidationPipe({ transform: true })) query: PageDto,
+    @GetUser() user: UserType,
+  ): Promise<NotificationModel[]> {
+    return this.notificationService.getAllNotifications(query, {
       role: user.role,
       id: user.id,
     });

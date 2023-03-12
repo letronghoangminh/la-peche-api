@@ -7,6 +7,7 @@ import {
   sensitiveFields,
 } from 'src/helpers/helpers';
 import { MailService } from 'src/mail/mail.service';
+import { PageDto, PaginationHandle } from 'src/prisma/helper/prisma.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateImageDto, UpdateImageDto, UpdateUserDto } from './dto/user.dto';
 import { ImageModel, UserModel } from './model/user.model';
@@ -195,12 +196,15 @@ export class UserService {
       });
   }
 
-  async getAllUsers(): Promise<UserModel[]> {
-    const users = await this.prismaService.user.findMany({
+  async getAllUsers(query: PageDto): Promise<UserModel[]> {
+    const dbQuery = {
       where: {
         isDeleted: false,
       },
-    });
+    };
+
+    PaginationHandle(dbQuery, query.page, query.pageSize);
+    const users = await this.prismaService.user.findMany(dbQuery);
 
     return PlainToInstance(UserModel, users);
   }
@@ -719,18 +723,24 @@ export class UserService {
     return Messages.USER.USER_UNSKIPPED;
   }
 
-  async getAllImages(user: {
-    role: string;
-    username: string;
-    userId: number;
-  }): Promise<ImageModel[]> {
+  async getAllImages(
+    query: PageDto,
+    user: {
+      role: string;
+      username: string;
+      userId: number;
+    },
+  ): Promise<ImageModel[]> {
     const condition = {};
 
     if (user.role === Role.USER) condition['userId'] = user.userId;
 
-    const userImages = await this.prismaService.user_image.findMany({
+    const dbQuery = {
       where: condition,
-    });
+    };
+
+    PaginationHandle(dbQuery, query.page, query.pageSize);
+    const userImages = await this.prismaService.user_image.findMany(dbQuery);
 
     return PlainToInstance(ImageModel, userImages);
   }
@@ -829,8 +839,11 @@ export class UserService {
     return 'Verification email sended';
   }
 
-  async getLikedUsers(options: { username: string }): Promise<UserModel[]> {
-    const user = await this.prismaService.user.findFirst({
+  async getLikedUsers(
+    query: PageDto,
+    options: { username: string },
+  ): Promise<UserModel[]> {
+    const dbQuery = {
       where: {
         username: options.username,
       },
@@ -841,7 +854,10 @@ export class UserService {
           },
         },
       },
-    });
+    };
+
+    PaginationHandle(dbQuery.select.liking, query.page, query.pageSize);
+    const user = await this.prismaService.user.findFirst(dbQuery);
 
     const likedUsers: UserModel[] = [];
 
@@ -858,8 +874,11 @@ export class UserService {
     return likedUsers;
   }
 
-  async getStarredUsers(options: { username: string }): Promise<UserModel[]> {
-    const user = await this.prismaService.user.findFirst({
+  async getStarredUsers(
+    query: PageDto,
+    options: { username: string },
+  ): Promise<UserModel[]> {
+    const dbQuery = {
       where: {
         username: options.username,
       },
@@ -870,7 +889,10 @@ export class UserService {
           },
         },
       },
-    });
+    };
+
+    PaginationHandle(dbQuery.select.staring, query.page, query.pageSize);
+    const user = await this.prismaService.user.findFirst(dbQuery);
 
     const starredUsers: UserModel[] = [];
 
@@ -887,8 +909,11 @@ export class UserService {
     return starredUsers;
   }
 
-  async getSkippedUsers(options: { username: string }): Promise<UserModel[]> {
-    const user = await this.prismaService.user.findFirst({
+  async getSkippedUsers(
+    query: PageDto,
+    options: { username: string },
+  ): Promise<UserModel[]> {
+    const dbQuery = {
       where: {
         username: options.username,
       },
@@ -899,7 +924,10 @@ export class UserService {
           },
         },
       },
-    });
+    };
+
+    PaginationHandle(dbQuery.select.skipping, query.page, query.pageSize);
+    const user = await this.prismaService.user.findFirst(dbQuery);
 
     const skippedUsers: UserModel[] = [];
 
@@ -916,10 +944,13 @@ export class UserService {
     return skippedUsers;
   }
 
-  async getRecommendedUsers(options: {
-    username: string;
-  }): Promise<UserModel[]> {
-    const user = await this.prismaService.user.findFirst({
+  async getRecommendedUsers(
+    query: PageDto,
+    options: {
+      username: string;
+    },
+  ): Promise<UserModel[]> {
+    const dbQuery = {
       where: {
         username: options.username,
       },
@@ -930,7 +961,14 @@ export class UserService {
           },
         },
       },
-    });
+    };
+
+    PaginationHandle(
+      dbQuery.select.recommendedUsers,
+      query.page,
+      query.pageSize,
+    );
+    const user = await this.prismaService.user.findFirst(dbQuery);
 
     const recommendedUsers: UserModel[] = [];
 
@@ -947,8 +985,11 @@ export class UserService {
     return recommendedUsers;
   }
 
-  async getMatchedUsers(options: { username: string }): Promise<UserModel[]> {
-    const user = await this.prismaService.user.findFirst({
+  async getMatchedUsers(
+    query: PageDto,
+    options: { username: string },
+  ): Promise<UserModel[]> {
+    const dbQuery = {
       where: {
         username: options.username,
       },
@@ -959,7 +1000,10 @@ export class UserService {
           },
         },
       },
-    });
+    };
+
+    PaginationHandle(dbQuery.select.matching, query.page, query.pageSize);
+    const user = await this.prismaService.user.findFirst(dbQuery);
 
     const matchedUsers: UserModel[] = [];
 
