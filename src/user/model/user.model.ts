@@ -72,6 +72,10 @@ export class UserModel {
   email: string;
 
   @Expose()
+  @ApiProperty({ type: String })
+  phoneNumber: string;
+
+  @Expose()
   @ApiProperty({ type: Number })
   yearOfBirth: number;
 
