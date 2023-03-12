@@ -1,6 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Role } from 'src/enum/role.enum';
-import { ErrorMessages, Messages, PlainToInstance, sensitiveFields } from 'src/helpers/helpers';
+import {
+  ErrorMessages,
+  Messages,
+  PlainToInstance,
+  sensitiveFields,
+} from 'src/helpers/helpers';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateImageDto, UpdateImageDto, UpdateUserDto } from './dto/user.dto';
@@ -47,8 +52,8 @@ export class UserService {
     let result: UserModel;
     if (
       (user.role === Role.USER && username === user.username) ||
-      (user.role === Role.ADMIN)
-    ){
+      user.role === Role.ADMIN
+    ) {
       const user = await this.prismaService.user.findFirst({
         where: {
           username: username,
@@ -57,8 +62,7 @@ export class UserService {
       });
 
       result = PlainToInstance(UserModel, user);
-    }
-    else {
+    } else {
       const user = await this.prismaService.user.findFirst({
         where: {
           username: username,
@@ -66,11 +70,11 @@ export class UserService {
         },
       });
 
-      if (user){
+      if (user) {
         for (const [key, value] of Object.entries(user.introShownFields)) {
           if (!value) delete user[key];
         }
-  
+
         sensitiveFields.map((field) => {
           delete user[field];
         });
@@ -81,7 +85,7 @@ export class UserService {
 
     if (!result) throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
 
-    return result
+    return result;
   }
 
   async updateUser(

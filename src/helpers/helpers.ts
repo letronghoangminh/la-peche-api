@@ -22,9 +22,17 @@ export const introShownFields = {
 };
 
 export const sensitiveFields = [
-  'id', 'cluster', 'isActivated', 'isDeleted', 'verifyAt', 'premiumEndsAt',
-  'createdAt', 'updatedAt', 'lastOnline', 'role', 
-]
+  'id',
+  'cluster',
+  'isActivated',
+  'isDeleted',
+  'verifyAt',
+  'premiumEndsAt',
+  'createdAt',
+  'updatedAt',
+  'lastOnline',
+  'role',
+];
 
 export const ErrorMessages = {
   AUTH: {

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
-import { Expose, Transform } from 'class-transformer';
+import { Expose } from 'class-transformer';
 import { Role } from 'src/enum/role.enum';
 
 export class UserModel {
