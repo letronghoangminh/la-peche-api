@@ -24,6 +24,7 @@ import { APISummaries } from 'src/helpers/helpers';
 import {
   CreateImageDto,
   LikeUserDto,
+  SkipUserDto,
   StarUserDto,
   UpdateImageDto,
   UpdateUserDto,
@@ -50,10 +51,24 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: ImageModel })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('images')
+  getAllImages(@GetUser() user: UserType): Promise<ImageModel[]> {
+    return this.userService.getAllImages({
+      role: user.role,
+      username: user.username,
+      userId: user.id,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
   @ApiOkResponse({ type: UserModel })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
-  @Get(':username')
+  @Get('info/:username')
   getUserByUsername(
     @Param('username') username: string,
     @GetUser() user: UserType,
@@ -118,12 +133,76 @@ export class UserController {
   @ApiOkResponse({ type: String })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
+  @Post('unlike')
+  unlikeUser(
+    @Body() dto: LikeUserDto,
+    @GetUser() user: UserType,
+  ): Promise<string> {
+    return this.userService.unlikeUser(dto.username, {
+      role: user.role,
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: String })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
   @Post('star')
   starUser(
     @Body() dto: StarUserDto,
     @GetUser() user: UserType,
   ): Promise<string> {
     return this.userService.starUser(dto.username, {
+      role: user.role,
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: String })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Post('unstar')
+  unstarUser(
+    @Body() dto: LikeUserDto,
+    @GetUser() user: UserType,
+  ): Promise<string> {
+    return this.userService.unstarUser(dto.username, {
+      role: user.role,
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: String })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Post('skip')
+  skipUser(
+    @Body() dto: SkipUserDto,
+    @GetUser() user: UserType,
+  ): Promise<string> {
+    return this.userService.skipUser(dto.username, {
+      role: user.role,
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: String })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Post('unskip')
+  unskipUser(
+    @Body() dto: SkipUserDto,
+    @GetUser() user: UserType,
+  ): Promise<string> {
+    return this.userService.unskipUser(dto.username, {
       role: user.role,
       username: user.username,
     });
@@ -144,15 +223,61 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.USER })
-  @ApiOkResponse({ type: ImageModel })
+  @ApiOkResponse({ type: UserModel })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
-  @Get('images')
-  getAllImages(@GetUser() user: UserType): Promise<ImageModel[]> {
-    return this.userService.getAllImages({
-      role: user.role,
+  @Get('liked')
+  getLikedUsers(@GetUser() user: UserType): Promise<UserModel[]> {
+    return this.userService.getLikedUsers({
       username: user.username,
-      userId: user.id,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: UserModel })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('starred')
+  getStarredUsers(@GetUser() user: UserType): Promise<UserModel[]> {
+    return this.userService.getStarredUsers({
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: UserModel })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('skipped')
+  getSkippedUsers(@GetUser() user: UserType): Promise<UserModel[]> {
+    return this.userService.getSkippedUsers({
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: UserModel })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('matched')
+  getMatchedUsers(@GetUser() user: UserType): Promise<UserModel[]> {
+    return this.userService.getMatchedUsers({
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: UserModel })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('recommended')
+  getRecommendedUsers(@GetUser() user: UserType): Promise<UserModel[]> {
+    return this.userService.getRecommendedUsers({
+      username: user.username,
     });
   }
 

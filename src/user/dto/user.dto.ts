@@ -143,3 +143,5 @@ export class LikeUserDto {
 }
 
 export class StarUserDto extends LikeUserDto {}
+
+export class SkipUserDto extends LikeUserDto {}

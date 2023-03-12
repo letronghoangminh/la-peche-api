@@ -32,6 +32,169 @@ export class UserService {
     return user.isVerified;
   }
 
+  private async removeUserFromPositiveLists(
+    username: string,
+    targetUsername: string,
+    options: {
+      like?: boolean;
+      star?: boolean;
+      recommend?: boolean;
+      match?: boolean;
+    },
+  ): Promise<void> {
+    if (options.like) {
+      const likedUser = await this.prismaService.user.findFirst({
+        where: {
+          username: username,
+          liking: {
+            some: {
+              username: targetUsername,
+            },
+          },
+        },
+      });
+
+      if (likedUser)
+        await this.prismaService.user.update({
+          where: {
+            username: username,
+          },
+          data: {
+            liking: {
+              disconnect: {
+                username: targetUsername,
+              },
+            },
+          },
+        });
+    }
+
+    if (options.star) {
+      const starredUser = await this.prismaService.user.findFirst({
+        where: {
+          username: username,
+          staring: {
+            some: {
+              username: targetUsername,
+            },
+          },
+        },
+      });
+
+      if (starredUser)
+        await this.prismaService.user.update({
+          where: {
+            username: username,
+          },
+          data: {
+            staring: {
+              disconnect: {
+                username: targetUsername,
+              },
+            },
+          },
+        });
+    }
+
+    if (options.recommend) {
+      const recommendedUser = await this.prismaService.user.findFirst({
+        where: {
+          username: username,
+          recommendedUsers: {
+            some: {
+              username: targetUsername,
+            },
+          },
+        },
+      });
+
+      if (recommendedUser)
+        await this.prismaService.user.update({
+          where: {
+            username: username,
+          },
+          data: {
+            recommendedUsers: {
+              disconnect: {
+                username: targetUsername,
+              },
+            },
+          },
+        });
+    }
+
+    if (options.match) {
+      const matchedUser = await this.prismaService.user.findFirst({
+        where: {
+          username: username,
+          matching: {
+            some: {
+              username: targetUsername,
+            },
+          },
+        },
+      });
+
+      if (matchedUser) {
+        await this.prismaService.user.update({
+          where: {
+            username: username,
+          },
+          data: {
+            matching: {
+              disconnect: {
+                username: targetUsername,
+              },
+            },
+          },
+        });
+
+        await this.prismaService.user.update({
+          where: {
+            username: targetUsername,
+          },
+          data: {
+            matching: {
+              disconnect: {
+                username: username,
+              },
+            },
+          },
+        });
+      }
+    }
+  }
+
+  private async removeUserFromNegativeLists(
+    username: string,
+    targetUsername: string,
+  ): Promise<void> {
+    const skippedUser = await this.prismaService.user.findFirst({
+      where: {
+        username: username,
+        skipping: {
+          some: {
+            username: targetUsername,
+          },
+        },
+      },
+    });
+
+    if (skippedUser)
+      await this.prismaService.user.update({
+        where: {
+          username: username,
+        },
+        data: {
+          skipping: {
+            disconnect: {
+              username: targetUsername,
+            },
+          },
+        },
+      });
+  }
+
   async getAllUsers(): Promise<UserModel[]> {
     const users = await this.prismaService.user.findMany({
       where: {
@@ -209,20 +372,169 @@ export class UserService {
       },
     });
 
-    Promise.all(
+    await Promise.all(
       targetUser.liking.map(async (likedUser) => {
         if (likedUser.username === user.username) {
-          await this.prismaService.match.create({
+          await this.prismaService.user.update({
             data: {
-              firstUsername: targetUser.username,
-              secondUsername: user.username,
+              matching: {
+                connect: {
+                  username: targetUser.username,
+                },
+              },
+            },
+            where: {
+              username: user.username,
+            },
+          });
+
+          await this.prismaService.user.update({
+            data: {
+              matching: {
+                connect: {
+                  username: user.username,
+                },
+              },
+            },
+            where: {
+              username: targetUser.username,
             },
           });
         }
       }),
     );
 
+    await this.removeUserFromNegativeLists(user.username, username);
+
     return Messages.USER.USER_LIKED;
+  }
+
+  async unlikeUser(
+    username: string,
+    user: {
+      role: string;
+      username: string;
+    },
+  ): Promise<string> {
+    if (!this.checkVerifiedUser(user.username))
+      throw new BadRequestException(ErrorMessages.USER.USER_INACTIVE);
+
+    if (username === user.username)
+      throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
+
+    const targetUser = await this.prismaService.user.findFirst({
+      where: {
+        username: username,
+        isActivated: true,
+        isDeleted: false,
+      },
+      select: {
+        liking: {
+          select: {
+            username: true,
+          },
+        },
+        username: true,
+      },
+    });
+
+    if (!targetUser)
+      throw new BadRequestException(ErrorMessages.USER.USER_NOT_FOUND);
+
+    const existedLikedUser = await this.prismaService.user.findFirst({
+      where: {
+        liking: {
+          some: {
+            username: username,
+          },
+        },
+        username: user.username,
+      },
+    });
+
+    if (!existedLikedUser)
+      throw new BadRequestException(ErrorMessages.USER.USER_NOT_LIKED);
+
+    await this.prismaService.user.update({
+      where: {
+        username: user.username,
+      },
+      data: {
+        liking: {
+          disconnect: {
+            username: username,
+          },
+        },
+      },
+    });
+
+    await this.removeUserFromPositiveLists(user.username, username, {
+      like: true,
+      match: true,
+    });
+
+    return Messages.USER.USER_UNLIKED;
+  }
+
+  async unstarUser(
+    username: string,
+    user: {
+      role: string;
+      username: string;
+    },
+  ): Promise<string> {
+    if (!this.checkVerifiedUser(user.username))
+      throw new BadRequestException(ErrorMessages.USER.USER_INACTIVE);
+
+    if (username === user.username)
+      throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
+
+    const targetUser = await this.prismaService.user.findFirst({
+      where: {
+        username: username,
+        isActivated: true,
+        isDeleted: false,
+      },
+      select: {
+        username: true,
+      },
+    });
+
+    if (!targetUser)
+      throw new BadRequestException(ErrorMessages.USER.USER_NOT_FOUND);
+
+    const existedStarredUser = await this.prismaService.user.findFirst({
+      where: {
+        staring: {
+          some: {
+            username: username,
+          },
+        },
+        username: user.username,
+      },
+    });
+
+    if (!existedStarredUser)
+      throw new BadRequestException(ErrorMessages.USER.USER_NOT_STARRED);
+
+    await this.prismaService.user.update({
+      where: {
+        username: user.username,
+      },
+      data: {
+        staring: {
+          disconnect: {
+            username: username,
+          },
+        },
+      },
+    });
+
+    await this.removeUserFromPositiveLists(user.username, username, {
+      star: true,
+    });
+
+    return Messages.USER.USER_UNSTARRED;
   }
 
   async starUser(
@@ -242,14 +554,9 @@ export class UserService {
       where: {
         username: username,
         isActivated: true,
-        isDeleted: true,
+        isDeleted: false,
       },
       select: {
-        staring: {
-          select: {
-            username: true,
-          },
-        },
         username: true,
       },
     });
@@ -257,7 +564,7 @@ export class UserService {
     if (!targetUser)
       throw new BadRequestException(ErrorMessages.USER.USER_NOT_FOUND);
 
-    const existedLikedUser = await this.prismaService.user.findFirst({
+    const existedStaredUser = await this.prismaService.user.findFirst({
       where: {
         staring: {
           some: {
@@ -268,7 +575,7 @@ export class UserService {
       },
     });
 
-    if (existedLikedUser)
+    if (existedStaredUser)
       throw new BadRequestException(ErrorMessages.USER.USER_STARRED);
 
     await this.prismaService.user.update({
@@ -284,7 +591,132 @@ export class UserService {
       },
     });
 
+    await this.removeUserFromNegativeLists(user.username, username);
+
     return Messages.USER.USER_STARRED;
+  }
+
+  async skipUser(
+    username: string,
+    user: {
+      role: string;
+      username: string;
+    },
+  ): Promise<string> {
+    if (!this.checkVerifiedUser(user.username))
+      throw new BadRequestException(ErrorMessages.USER.USER_INACTIVE);
+
+    if (username === user.username)
+      throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
+
+    const targetUser = await this.prismaService.user.findFirst({
+      where: {
+        username: username,
+        isActivated: true,
+        isDeleted: false,
+      },
+      select: {
+        username: true,
+      },
+    });
+
+    if (!targetUser)
+      throw new BadRequestException(ErrorMessages.USER.USER_NOT_FOUND);
+
+    const existedSkippedUser = await this.prismaService.user.findFirst({
+      where: {
+        skipping: {
+          some: {
+            username: username,
+          },
+        },
+        username: user.username,
+      },
+    });
+
+    if (existedSkippedUser)
+      throw new BadRequestException(ErrorMessages.USER.USER_SKIPPED);
+
+    await this.prismaService.user.update({
+      where: {
+        username: user.username,
+      },
+      data: {
+        skipping: {
+          connect: {
+            username: username,
+          },
+        },
+      },
+    });
+
+    await this.removeUserFromPositiveLists(user.username, username, {
+      like: true,
+      star: true,
+      recommend: true,
+      match: true,
+    });
+
+    return Messages.USER.USER_SKIPPED;
+  }
+
+  async unskipUser(
+    username: string,
+    user: {
+      role: string;
+      username: string;
+    },
+  ): Promise<string> {
+    if (!this.checkVerifiedUser(user.username))
+      throw new BadRequestException(ErrorMessages.USER.USER_INACTIVE);
+
+    if (username === user.username)
+      throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
+
+    const targetUser = await this.prismaService.user.findFirst({
+      where: {
+        username: username,
+        isActivated: true,
+        isDeleted: false,
+      },
+      select: {
+        username: true,
+      },
+    });
+
+    if (!targetUser)
+      throw new BadRequestException(ErrorMessages.USER.USER_NOT_FOUND);
+
+    const existedSkippedUser = await this.prismaService.user.findFirst({
+      where: {
+        skipping: {
+          some: {
+            username: username,
+          },
+        },
+        username: user.username,
+      },
+    });
+
+    if (!existedSkippedUser)
+      throw new BadRequestException(ErrorMessages.USER.USER_NOT_SKIPPED);
+
+    await this.prismaService.user.update({
+      where: {
+        username: user.username,
+      },
+      data: {
+        skipping: {
+          disconnect: {
+            username: username,
+          },
+        },
+      },
+    });
+
+    await this.removeUserFromNegativeLists(user.username, username);
+
+    return Messages.USER.USER_UNSKIPPED;
   }
 
   async getAllImages(user: {
@@ -395,5 +827,152 @@ export class UserService {
     );
 
     return 'Verification email sended';
+  }
+
+  async getLikedUsers(options: { username: string }): Promise<UserModel[]> {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        username: options.username,
+      },
+      select: {
+        liking: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+
+    const likedUsers: UserModel[] = [];
+
+    await Promise.all(
+      user.liking.map(async (likedUser) => {
+        const user = await this.getUserByUsername(likedUser.username, {
+          role: Role.USER,
+          username: options.username,
+        });
+        likedUsers.push(PlainToInstance(UserModel, user));
+      }),
+    );
+
+    return likedUsers;
+  }
+
+  async getStarredUsers(options: { username: string }): Promise<UserModel[]> {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        username: options.username,
+      },
+      select: {
+        staring: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+
+    const starredUsers: UserModel[] = [];
+
+    await Promise.all(
+      user.staring.map(async (starredUser) => {
+        const user = await this.getUserByUsername(starredUser.username, {
+          role: Role.USER,
+          username: options.username,
+        });
+        starredUsers.push(PlainToInstance(UserModel, user));
+      }),
+    );
+
+    return starredUsers;
+  }
+
+  async getSkippedUsers(options: { username: string }): Promise<UserModel[]> {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        username: options.username,
+      },
+      select: {
+        skipping: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+
+    const skippedUsers: UserModel[] = [];
+
+    await Promise.all(
+      user.skipping.map(async (skippedUser) => {
+        const user = await this.getUserByUsername(skippedUser.username, {
+          role: Role.USER,
+          username: options.username,
+        });
+        skippedUsers.push(PlainToInstance(UserModel, user));
+      }),
+    );
+
+    return skippedUsers;
+  }
+
+  async getRecommendedUsers(options: {
+    username: string;
+  }): Promise<UserModel[]> {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        username: options.username,
+      },
+      select: {
+        recommendedUsers: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+
+    const recommendedUsers: UserModel[] = [];
+
+    await Promise.all(
+      user.recommendedUsers.map(async (recommendedUser) => {
+        const user = await this.getUserByUsername(recommendedUser.username, {
+          role: Role.USER,
+          username: options.username,
+        });
+        recommendedUsers.push(PlainToInstance(UserModel, user));
+      }),
+    );
+
+    return recommendedUsers;
+  }
+
+  async getMatchedUsers(options: { username: string }): Promise<UserModel[]> {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        username: options.username,
+      },
+      select: {
+        matching: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+
+    const matchedUsers: UserModel[] = [];
+
+    await Promise.all(
+      user.matching.map(async (matchedUser) => {
+        const user = await this.getUserByUsername(matchedUser.username, {
+          role: Role.USER,
+          username: options.username,
+        });
+        matchedUsers.push(PlainToInstance(UserModel, user));
+      }),
+    );
+
+    return matchedUsers;
   }
 }

@@ -14,8 +14,8 @@ model user {
   cluster          Int?
   isActivated      Boolean   @default(true)
   isDeleted        Boolean   @default(false)
-  isVerified        Boolean   @default(false)
-  verifyToken      String?    
+  isVerified       Boolean   @default(false)
+  verifyToken      String?
   verifyAt         DateTime? @db.DateTime(0)
   premiumEndsAt    DateTime? @db.DateTime(0)
   createdAt        DateTime  @default(now()) @db.DateTime(0)
@@ -49,35 +49,24 @@ model user {
   speaks      String?
   phoneNumber String?
 
-  notifications   notification[]
-  coupons         coupon[]
-  userImages      user_image[]
-  reportsMade     report[]       @relation("reports_made")
-  reportsReceived report[]       @relation("reports_received")
-  likedBy         user[]         @relation("user_likes")
-  liking          user[]         @relation("user_likes")
-  staredBy        user[]         @relation("user_stars")
-  staring         user[]         @relation("user_stars")
-  firstMatch      match[]        @relation("first_user")
-  secondMatch     match[]        @relation("second_user")
+  notifications    notification[]
+  coupons          coupon[]
+  userImages       user_image[]
+  reportsMade      report[]       @relation("reports_made")
+  reportsReceived  report[]       @relation("reports_received")
+  likedBy          user[]         @relation("user_likes")
+  liking           user[]         @relation("user_likes")
+  staredBy         user[]         @relation("user_stars")
+  staring          user[]         @relation("user_stars")
+  recommendedUsers user[]         @relation("user_recommend")
+  recommendedTo    user[]         @relation("user_recommend")
+  skippedBy        user[]         @relation("user_skip")
+  skipping         user[]         @relation("user_skip")
+  matching         user[]         @relation("user_match")
+  matched          user[]         @relation("user_match")
 
   @@index([username])
   @@index([email])
-}
-
-model match {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.DateTime(0)
-
-  firstUsername String
-  firstUser     user   @relation("first_user", fields: [firstUsername], references: [username], onDelete: Cascade, onUpdate: NoAction, map: "match_firstUsername_fk")
-
-  secondUsername String
-  secondUser     user   @relation("second_user", fields: [firstUsername], references: [username], onDelete: Cascade, onUpdate: NoAction, map: "match_secondUsername_fk")
-
-  @@index([firstUsername], map: "match_firstUsername_fk")
-  @@index([secondUsername], map: "match_secondUsername_fk")
 }
 
 model notification {

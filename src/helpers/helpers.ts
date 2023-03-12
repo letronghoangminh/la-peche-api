@@ -53,8 +53,12 @@ export const ErrorMessages = {
   USER: {
     USER_NOT_FOUND: 'User not found',
     USER_LIKED: 'This user has already been liked',
+    USER_NOT_LIKED: 'This user has not been liked',
     USER_INVALID: 'User invalid',
     USER_STARRED: 'This user has already been starred',
+    USER_NOT_STARRED: 'This user has not been starred',
+    USER_SKIPPED: 'This user has already been skipped',
+    USER_NOT_SKIPPED: 'This user has not been skipped',
     USER_INACTIVE: 'Please activate this user first',
     USER_IMAGE_NOT_EXIST: 'Image not found',
   },
@@ -68,7 +72,11 @@ export const Messages = {
   },
   USER: {
     USER_LIKED: 'This user has been liked',
+    USER_UNLIKED: 'This user has been unliked',
     USER_STARRED: 'This user has been starred',
+    USER_UNSTARRED: 'This user has been unstarred',
+    USER_SKIPPED: 'This user has been skipped',
+    USER_UNSKIPPED: 'This user has been unskipped',
   },
 };
 
