@@ -65,6 +65,8 @@ async function main() {
     sign: true,
     smokes: false,
     speaks: true,
+    email: false,
+    phoneNumber: false
   }
   adminNames.forEach(async (name) => {
     await prisma.user.create({

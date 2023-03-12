@@ -17,7 +17,14 @@ export const introShownFields = {
   sign: false,
   smokes: false,
   speaks: false,
+  email: false,
+  phoneNumber: false,
 };
+
+export const sensitiveFields = [
+  'id', 'cluster', 'isActivated', 'isDeleted', 'verifyAt', 'premiumEndsAt',
+  'createdAt', 'updatedAt', 'lastOnline', 'role', 
+]
 
 export const ErrorMessages = {
   AUTH: {

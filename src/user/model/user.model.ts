@@ -41,10 +41,6 @@ export class UserModel {
   updatedAt: Date;
 
   @Expose()
-  @Transform(({ obj }) => obj.introShownFields)
-  introShownFields: Prisma.JsonValue;
-
-  @Expose()
   @ApiProperty({ type: Date })
   lastOnline: Date;
 
