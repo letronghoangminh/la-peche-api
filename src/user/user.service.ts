@@ -821,20 +821,21 @@ export class UserService {
   }
 
   async verifyUser(user: { email: string; username: string }): Promise<string> {
-    const existedUser = await this.prismaService.user.findFirst({
-      where: {
-        username: user.username,
-      },
-      select: {
-        name: true,
-        verifyToken: true,
-      },
-    });
+    // const existedUser = await this.prismaService.user.findFirst({
+    //   where: {
+    //     username: user.username,
+    //   },
+    //   select: {
+    //     name: true,
+    //     verifyToken: true,
+    //   },
+    // });
 
-    this.mailService.sendEmailConfirmation(
-      { email: user.email, name: existedUser.name },
-      existedUser.verifyToken,
-    );
+    // this.mailService.sendEmailConfirmation(
+    //   { email: user.email, name: existedUser.name },
+    //   existedUser.verifyToken,
+    // );
+    console.log(user);
 
     return 'Verification email sended';
   }

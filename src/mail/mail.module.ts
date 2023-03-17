@@ -20,6 +20,9 @@ import { ConfigService } from '@nestjs/config';
         defaults: {
           from: `"No Reply" <${config.get('MAIL_FROM')}>`,
         },
+        tls: {
+          rejectUnauthorized: false,
+        },
         template: {
           dir: join(__dirname, 'templates'),
           adapter: new HandlebarsAdapter(),
