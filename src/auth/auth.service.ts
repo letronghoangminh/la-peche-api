@@ -50,6 +50,16 @@ export class AuthService {
       where: {
         username: dto.username,
       },
+      include: {
+        userImages: {
+          select: {
+            url: true,
+          },
+          where: {
+            isThumbnail: true,
+          },
+        },
+      },
     });
 
     if (!user)
@@ -66,6 +76,8 @@ export class AuthService {
 
     if (!passwordMatches)
       throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
+
+    if (user.userImages[0]) user['avatarUrl'] = user.userImages[0].url;
 
     return this.signToken(user);
   }
@@ -104,7 +116,14 @@ export class AuthService {
   }
 
   async signToken(user: user): Promise<{ token: string }> {
-    const pickedFields: string[] = ['id', 'email', 'name', 'role', 'username'];
+    const pickedFields: string[] = [
+      'id',
+      'email',
+      'name',
+      'role',
+      'username',
+      'avatarUrl',
+    ];
     const payload = pick(user, pickedFields);
 
     const jwtSecret = this.config.get('JWT_SECRET');
