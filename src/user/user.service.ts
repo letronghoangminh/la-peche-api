@@ -4,6 +4,7 @@ import {
   ErrorMessages,
   Messages,
   PlainToInstance,
+  genRandomString,
   sensitiveFields,
 } from 'src/helpers/helpers';
 import { MailService } from 'src/mail/mail.service';
@@ -821,21 +822,30 @@ export class UserService {
   }
 
   async verifyUser(user: { email: string; username: string }): Promise<string> {
-    // const existedUser = await this.prismaService.user.findFirst({
-    //   where: {
-    //     username: user.username,
-    //   },
-    //   select: {
-    //     name: true,
-    //     verifyToken: true,
-    //   },
-    // });
+    const verifyToken = genRandomString(10);
 
-    // this.mailService.sendEmailConfirmation(
-    //   { email: user.email, name: existedUser.name },
-    //   existedUser.verifyToken,
-    // );
-    console.log(user);
+    const existedUser = await this.prismaService.user.findFirst({
+      where: {
+        username: user.username,
+      },
+      select: {
+        name: true,
+      },
+    });
+
+    await this.prismaService.user.update({
+      data: {
+        verifyToken: verifyToken,
+      },
+      where: {
+        username: user.username,
+      },
+    });
+
+    this.mailService.sendEmailConfirmation(
+      { email: user.email, name: existedUser.name },
+      verifyToken,
+    );
 
     return 'Verification email sended';
   }

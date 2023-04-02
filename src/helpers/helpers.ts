@@ -38,6 +38,7 @@ export const ErrorMessages = {
   AUTH: {
     USER_INACTIVE: 'This user has been deactivated',
     CREDENTIALS_INCORRECT: 'Credentials incorrect',
+    INVALID_TOKEN: 'Invalid token',
   },
   NOTIFICATION: {
     NOTI_NOT_FOUND: 'Notification not found',

@@ -1,9 +1,15 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   LoginDto,
   RefreshTokenDto,
   RegisterDto,
+  RequestResetPasswordDto,
+  ResetPasswordDto,
   VerifyUserDto,
 } from './dto/auth.dto';
 import * as argon from 'argon2';
@@ -13,6 +19,7 @@ import { Prisma, user } from '@prisma/client';
 import { genRandomString, introShownFields } from 'src/helpers/helpers';
 import { pick } from 'lodash';
 import { ErrorMessages } from 'src/helpers/helpers';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +27,7 @@ export class AuthService {
     private prisma: PrismaService,
     private config: ConfigService,
     private jwt: JwtService,
+    private mailService: MailService,
   ) {}
 
   private readonly jwtSecret = this.config.get('JWT_SECRET');
@@ -120,6 +128,57 @@ export class AuthService {
     }
 
     return 'Verify user failed';
+  }
+
+  async resetPasswordRequest(dto: RequestResetPasswordDto): Promise<void> {
+    const resetToken = genRandomString(10);
+
+    const user = await this.prisma.user.findFirst({
+      where: {
+        email: dto.email,
+      },
+    });
+
+    if (!user) return;
+
+    await this.prisma.user.update({
+      data: {
+        resetToken: resetToken,
+      },
+      where: {
+        email: dto.email,
+      },
+    });
+
+    await this.mailService.sendResetPasswordEmail(
+      {
+        email: user.email,
+        name: user.name,
+      },
+      resetToken,
+    );
+  }
+
+  async resetPassword(dto: ResetPasswordDto): Promise<void> {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        resetToken: dto.token,
+      },
+    });
+
+    if (!user) throw new BadRequestException(ErrorMessages.AUTH.INVALID_TOKEN);
+
+    const hashedPassword = await argon.hash(dto.password);
+
+    await this.prisma.user.update({
+      data: {
+        hashedPassword: hashedPassword,
+        resetToken: null,
+      },
+      where: {
+        email: user.email,
+      },
+    });
   }
 
   async signToken(

@@ -62,3 +62,26 @@ export class RefreshTokenDto {
   @ApiProperty({ type: String, required: true, nullable: false })
   refreshToken: string;
 }
+
+export class RequestResetPasswordDto {
+  @IsString()
+  @IsEmail()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  email: string;
+}
+
+export class ResetPasswordDto {
+  @IsString()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  token: string;
+
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  @IsString()
+  @MinLength(6)
+  @MaxLength(20)
+  @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+    message: 'password too weak',
+  })
+  password: string;
+}
