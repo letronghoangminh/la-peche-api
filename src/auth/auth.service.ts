@@ -1,6 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { LoginDto, RegisterDto, VerifyUserDto } from './dto/auth.dto';
+import {
+  LoginDto,
+  RefreshTokenDto,
+  RegisterDto,
+  VerifyUserDto,
+} from './dto/auth.dto';
 import * as argon from 'argon2';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -16,6 +21,8 @@ export class AuthService {
     private config: ConfigService,
     private jwt: JwtService,
   ) {}
+
+  private readonly jwtSecret = this.config.get('JWT_SECRET');
 
   async register(dto: RegisterDto) {
     const hashedPassword = await argon.hash(dto.password);
@@ -50,6 +57,16 @@ export class AuthService {
       where: {
         username: dto.username,
       },
+      include: {
+        userImages: {
+          select: {
+            url: true,
+          },
+          where: {
+            isThumbnail: true,
+          },
+        },
+      },
     });
 
     if (!user)
@@ -66,6 +83,8 @@ export class AuthService {
 
     if (!passwordMatches)
       throw new ForbiddenException(ErrorMessages.AUTH.CREDENTIALS_INCORRECT);
+
+    if (user.userImages[0]) user['avatarUrl'] = user.userImages[0].url;
 
     return this.signToken(user);
   }
@@ -103,19 +122,50 @@ export class AuthService {
     return 'Verify user failed';
   }
 
-  async signToken(user: user): Promise<{ token: string }> {
-    const pickedFields: string[] = ['id', 'email', 'name', 'role', 'username'];
+  async signToken(
+    user: user,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const pickedFields: string[] = [
+      'id',
+      'email',
+      'name',
+      'role',
+      'username',
+      'avatarUrl',
+    ];
     const payload = pick(user, pickedFields);
 
-    const jwtSecret = this.config.get('JWT_SECRET');
+    const accessToken: string = await this.jwt.signAsync(payload, {
+      expiresIn: '60m ',
+      secret: this.jwtSecret,
+    });
 
-    const token: string = await this.jwt.signAsync(payload, {
-      expiresIn: '60m',
-      secret: jwtSecret,
+    const refreshToken: string = await this.jwt.signAsync(payload, {
+      expiresIn: '7d',
+      secret: this.jwtSecret,
     });
 
     return {
-      token: token,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    };
+  }
+
+  async refreshToken(dto: RefreshTokenDto) {
+    const payload = await this.jwt.verify(dto.refreshToken, {
+      secret: this.jwtSecret,
+    });
+
+    delete payload.iat;
+    delete payload.exp;
+
+    const accessToken: string = await this.jwt.signAsync(payload, {
+      expiresIn: '60m',
+      secret: this.jwtSecret,
+    });
+
+    return {
+      accessToken: accessToken,
     };
   }
 }

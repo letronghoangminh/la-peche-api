@@ -78,7 +78,7 @@ model notification {
   updatedAt DateTime @default(now()) @updatedAt @db.DateTime(0)
 
   userId Int
-  user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "notification_userId_fk")
+  user   user @relation(references: [id], fields: [userId], onDelete: Cascade, onUpdate: NoAction, map: "notification_userId_fk")
 
   @@index([userId], map: "notification_userId_fk")
 }
@@ -93,7 +93,7 @@ model coupon {
   updatedAt DateTime @default(now()) @updatedAt @db.DateTime(0)
 
   userId Int
-  user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "coupon_userId_fk")
+  user   user @relation(references: [id], fields: [userId], onDelete: Cascade, onUpdate: NoAction, map: "coupon_userId_fk")
 
   @@index([userId], map: "coupon_userId_fk")
 }
@@ -107,7 +107,7 @@ model user_image {
   updatedAt DateTime @default(now()) @updatedAt @db.DateTime(0)
 
   userId Int
-  user   user @relation(references: [id], fields: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_image_userId_fk")
+  user   user @relation(references: [id], fields: [userId], onDelete: Cascade, onUpdate: NoAction, map: "user_image_userId_fk")
 
   @@index([userId], map: "user_image_userId_fk")
 }

@@ -18,7 +18,12 @@ import { user } from '@prisma/client';
 import { APISummaries } from 'src/helpers/helpers';
 import { AuthService } from './auth.service';
 import { GetUser } from './decorator/get-user.decorator';
-import { LoginDto, RegisterDto, VerifyUserDto } from './dto/auth.dto';
+import {
+  LoginDto,
+  RefreshTokenDto,
+  RegisterDto,
+  VerifyUserDto,
+} from './dto/auth.dto';
 import { UserGuard } from './guard/auth.guard';
 import { AuthModel } from './model/auth.model';
 
@@ -43,6 +48,14 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authSerivce.login(dto);
+  }
+
+  @ApiOperation({ summary: APISummaries.UNAUTH })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: AuthModel })
+  @Post('refresh-token')
+  refreshToken(@Body() dto: RefreshTokenDto) {
+    return this.authSerivce.refreshToken(dto);
   }
 
   @ApiOperation({ summary: APISummaries.USER })
