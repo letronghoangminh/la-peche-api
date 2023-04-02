@@ -136,7 +136,7 @@ export class AuthService {
     const payload = pick(user, pickedFields);
 
     const accessToken: string = await this.jwt.signAsync(payload, {
-      expiresIn: '60m ',
+      expiresIn: '60m',
       secret: this.jwtSecret,
     });
 
