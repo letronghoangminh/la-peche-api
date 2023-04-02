@@ -22,6 +22,8 @@ import {
   LoginDto,
   RefreshTokenDto,
   RegisterDto,
+  RequestResetPasswordDto,
+  ResetPasswordDto,
   VerifyUserDto,
 } from './dto/auth.dto';
 import { UserGuard } from './guard/auth.guard';
@@ -53,7 +55,7 @@ export class AuthController {
   @ApiOperation({ summary: APISummaries.UNAUTH })
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: AuthModel })
-  @Post('refresh-token')
+  @Post('refresh')
   refreshToken(@Body() dto: RefreshTokenDto) {
     return this.authSerivce.refreshToken(dto);
   }
@@ -69,5 +71,25 @@ export class AuthController {
       email: user.email,
       username: user.username,
     });
+  }
+
+  @ApiOperation({ summary: APISummaries.UNAUTH })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: String })
+  @Post('request-reset-password')
+  resetPasswordRequest(@Body() dto: RequestResetPasswordDto) {
+    this.authSerivce.resetPasswordRequest(dto);
+
+    return 'Reset password request sent, please check your email for next steps';
+  }
+
+  @ApiOperation({ summary: APISummaries.UNAUTH })
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: String })
+  @Post('reset-password')
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    this.authSerivce.resetPassword(dto);
+
+    return 'Password reset successfully';
   }
 }
