@@ -74,6 +74,7 @@ pipeline {
             sed -i "/^MAIL_PASSWORD=/c MAIL_PASSWORD=${MAIL_PASSWORD}" .env
             sed -i "/^MAIL_HOST=/c MAIL_HOST=${MAIL_HOST}" .env
             sed -i "/^JWT_SECRET=/c JWT_SECRET=${JWT_SECRET}" .env
+            sed -i "/^APPLICATION_ROOT=/c APPLICATION_ROOT=https://lapeche.date" .env
 
             docker login ${DOCKER_REGISTRY} --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
             docker build --build-arg NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY} -t ${DOCKER_IMAGE}:${DOCKER_TAG_BUILD} -t ${DOCKER_IMAGE}:latest .
