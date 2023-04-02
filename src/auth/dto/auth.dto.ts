@@ -55,3 +55,10 @@ export class VerifyUserDto {
   @ApiProperty({ type: String, required: true, nullable: false })
   token: string;
 }
+
+export class RefreshTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ type: String, required: true, nullable: false })
+  refreshToken: string;
+}

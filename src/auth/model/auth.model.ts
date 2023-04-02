@@ -4,5 +4,9 @@ import { Expose } from 'class-transformer';
 export class AuthModel {
   @Expose()
   @ApiProperty({ type: String })
-  token: string;
+  accessToken: string;
+
+  @Expose()
+  @ApiProperty({ type: String })
+  refreshToken: string;
 }
