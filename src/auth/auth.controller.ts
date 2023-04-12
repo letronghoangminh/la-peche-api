@@ -28,20 +28,21 @@ import {
 } from './dto/auth.dto';
 import { UserGuard } from './guard/auth.guard';
 import { AuthModel } from './model/auth.model';
+import { response } from 'express';
 
 type UserType = Pick<user, 'role' | 'id' | 'username' | 'email'>;
 
 @Controller('auth')
 @ApiTags('AUTH')
 export class AuthController {
-  constructor(private authSerivce: AuthService) {}
+  constructor(private authService: AuthService) {}
 
   @ApiOperation({ summary: APISummaries.UNAUTH })
   @HttpCode(HttpStatus.CREATED)
   @ApiOkResponse({ type: AuthModel })
   @Post('register')
   register(@Body() dto: RegisterDto) {
-    return this.authSerivce.register(dto);
+    return this.authService.register(dto);
   }
 
   @ApiOperation({ summary: APISummaries.UNAUTH })
@@ -49,7 +50,7 @@ export class AuthController {
   @ApiOkResponse({ type: AuthModel })
   @Post('login')
   login(@Body() dto: LoginDto) {
-    return this.authSerivce.login(dto);
+    return this.authService.login(dto);
   }
 
   @ApiOperation({ summary: APISummaries.UNAUTH })
@@ -57,7 +58,7 @@ export class AuthController {
   @ApiOkResponse({ type: AuthModel })
   @Post('refresh')
   refreshToken(@Body() dto: RefreshTokenDto) {
-    return this.authSerivce.refreshToken(dto);
+    return this.authService.refreshToken(dto);
   }
 
   @ApiOperation({ summary: APISummaries.USER })
@@ -67,7 +68,7 @@ export class AuthController {
   @UseGuards(UserGuard)
   @Get('verify')
   verify(@Query() query: VerifyUserDto, @GetUser() user: UserType) {
-    return this.authSerivce.verify(query, {
+    return this.authService.verify(query, {
       email: user.email,
       username: user.username,
     });
@@ -78,7 +79,7 @@ export class AuthController {
   @ApiOkResponse({ type: String })
   @Post('request-reset-password')
   resetPasswordRequest(@Body() dto: RequestResetPasswordDto) {
-    this.authSerivce.resetPasswordRequest(dto);
+    this.authService.resetPasswordRequest(dto);
 
     return 'Reset password request sent, please check your email for next steps';
   }
@@ -88,7 +89,7 @@ export class AuthController {
   @ApiOkResponse({ type: String })
   @Post('reset-password')
   resetPassword(@Body() dto: ResetPasswordDto) {
-    this.authSerivce.resetPassword(dto);
+    this.authService.resetPassword(dto);
 
     return 'Password reset successfully';
   }
