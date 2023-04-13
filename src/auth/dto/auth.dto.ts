@@ -17,7 +17,7 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true, nullable: false })
-  @Matches(/^[A-Za-z]+$/)
+  @Matches(/^[A-Za-z ]+$/)
   name: string;
 
   @IsString()
