@@ -17,7 +17,7 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String, required: true, nullable: false })
-  @Matches(/^[a-zA-Z0-9_ ]{6,20}$/)
+  @Matches(/^[A-Za-z]+$/)
   name: string;
 
   @IsString()
