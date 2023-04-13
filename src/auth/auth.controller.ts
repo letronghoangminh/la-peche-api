@@ -28,7 +28,6 @@ import {
 } from './dto/auth.dto';
 import { UserGuard } from './guard/auth.guard';
 import { AuthModel } from './model/auth.model';
-import { response } from 'express';
 
 type UserType = Pick<user, 'role' | 'id' | 'username' | 'email'>;
 
