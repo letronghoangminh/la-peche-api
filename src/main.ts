@@ -7,7 +7,7 @@ require('newrelic');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('_api');
   const configService = app.get(ConfigService);
 
   const swaggerConfig = new DocumentBuilder()
@@ -21,7 +21,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 
   SwaggerModule.setup(
-    `api/${configService.get('swagger.docsUrl')}`,
+    `_api/${configService.get('swagger.docsUrl')}`,
     app,
     document,
   );
