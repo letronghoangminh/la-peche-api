@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { IsOptional, IsString, IsUrl, Matches } from 'class-validator';
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Matches,
+} from 'class-validator';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -118,7 +124,7 @@ export class CreateImageDto {
   url: string;
 
   @Expose()
-  @IsString()
+  @IsBoolean()
   @ApiProperty({ type: Boolean, required: true, nullable: false })
   isThumbnail: boolean;
 }
