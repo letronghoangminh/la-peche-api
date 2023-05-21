@@ -30,6 +30,7 @@ import {
   SkipUserDto,
   StarUserDto,
   UpdateImageDto,
+  UpdateIntoShownFieldsDto,
   UpdateUserDto,
 } from './dto/user.dto';
 import { ImageModel, UserDetailInfo, UserModel } from './model/user.model';
@@ -85,6 +86,24 @@ export class UserController {
       role: user.role,
       username: user.username,
     });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: String })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Put('shown-fields')
+  updateIntroShownFields(
+    @Body() dto: UpdateIntoShownFieldsDto,
+    @GetUser() user: UserType,
+  ): Promise<string> {
+    this.userService.updateIntroShownFields(dto, {
+      role: user.role,
+      username: user.username,
+    });
+
+    return Promise.resolve('Updated');
   }
 
   @HttpCode(HttpStatus.OK)

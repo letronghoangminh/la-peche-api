@@ -26,21 +26,50 @@ function makeEmail(length: number): string {
 }
 
 async function main() {
-  const hashedPassword: string = "$argon2id$v=19$m=65536,t=3,p=4$WNAxshlttjgKgwkN/CF8WQ$06hKwaFlJp/UmQz1ZXx57ZLRNqFudqHtrJneAhuqDaw";
+  const hashedPassword =
+    '$argon2id$v=19$m=65536,t=3,p=4$WNAxshlttjgKgwkN/CF8WQ$06hKwaFlJp/UmQz1ZXx57ZLRNqFudqHtrJneAhuqDaw';
   const adminNames: string[] = ['psycholog1st', 'chovbeovkieu', 'abiem'];
-  const userNames: string[] = ['Natsuya', 'Makima', 'Fubuki', 'Furuhashi', 'Kaito', 'Huy Ph', 'letitthieu', 'A Ca LC'];
+  const userNames: string[] = [
+    'Natsuya',
+    'Makima',
+    'Fubuki',
+    'Furuhashi',
+    'Kaito',
+    'Huy Ph',
+    'letitthieu',
+    'A Ca LC',
+  ];
   const genders: string[] = ['male', 'female', 'other'];
-  const statuses: string[] = ['married', 'single', 'had a girl friend', 'had a boy friend'];
+  const statuses: string[] = [
+    'married',
+    'single',
+    'had a girl friend',
+    'had a boy friend',
+  ];
   const orientations: string[] = ['female', 'male', 'other'];
-  const biographics: string[] = ['Don\' follow your dream, follow me', 'I love anime', 'Dm thang keo con', 'The may da nghe', 'Biet thi noi, khong biet la a bi em'];
+  const biographics: string[] = [
+    "Don' follow your dream, follow me",
+    'I love anime',
+    'Dm thang keo con',
+    'The may da nghe',
+    'Biet thi noi, khong biet la a bi em',
+  ];
   const yearOfBirthes: number[] = [2002, 2000, 2001];
   const bodyTypes: string[] = ['normal', 'fat', 'thin'];
   const diets: string[] = ['normal', 'on diet'];
   const drinks: string[] = ['coke', 'mango juice', 'coffee'];
   const drugs: string[] = ['none', 'heroin', 'weed'];
-  const educations: string[] = ['High school students', 'Uni students', 'Graduated'];
+  const educations: string[] = [
+    'High school students',
+    'Uni students',
+    'Graduated',
+  ];
   const ethnicities: string[] = ['King', 'Aryan', 'Saxon'];
-  const jobs: string[] = ['DevOps Engineer', 'AI Engineer', 'Software Engineer'];
+  const jobs: string[] = [
+    'DevOps Engineer',
+    'AI Engineer',
+    'Software Engineer',
+  ];
   const locations: string[] = ['Da Nang', 'Laos', 'Japan', 'Amerika'];
   const offspring: string[] = ['none', '1 kid', '2 kids'];
   const pets: string[] = ['dog', 'cat', 'none'];
@@ -66,8 +95,9 @@ async function main() {
     smokes: false,
     speaks: true,
     email: false,
-    phoneNumber: false
-  }
+    phoneNumber: false,
+  };
+
   adminNames.forEach(async (name) => {
     await prisma.user.create({
       data: {
