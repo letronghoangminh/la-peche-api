@@ -26,7 +26,6 @@ import { APISummaries } from 'src/helpers/helpers';
 import { PageDto } from 'src/prisma/helper/prisma.helper';
 import {
   CreateImageDto,
-  GetListUserByUsernameDto,
   LikeUserDto,
   SkipUserDto,
   StarUserDto,
@@ -292,14 +291,14 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.USER })
-  @ApiOkResponse({ type: UserModel })
+  @ApiOkResponse({ type: UserDetailInfo })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('recommended')
   getRecommendedUsers(
     @Query(new ValidationPipe({ transform: true })) query: PageDto,
     @GetUser() user: UserType,
-  ): Promise<UserModel[]> {
+  ): Promise<UserDetailInfo[]> {
     return this.userService.getRecommendedUsers(query, {
       username: user.username,
     });
@@ -368,22 +367,6 @@ export class UserController {
     @GetUser() user: UserType,
   ): Promise<UserDetailInfo> {
     return this.userService.getUserInfoWithImagesByUsername(username, {
-      role: user.role,
-      username: user.username,
-    });
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: APISummaries.USER })
-  @ApiOkResponse({ type: [UserDetailInfo] })
-  @ApiBearerAuth()
-  @UseGuards(UserGuard)
-  @Get('list')
-  getListUserByUsername(
-    @Query() query: GetListUserByUsernameDto,
-    @GetUser() user: UserType,
-  ): Promise<UserDetailInfo[]> {
-    return this.userService.getListUserByUsername(query, {
       role: user.role,
       username: user.username,
     });

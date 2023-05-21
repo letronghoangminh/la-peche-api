@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import {
   IsBoolean,
-  IsNotEmpty,
   IsOptional,
   IsString,
   IsUrl,
@@ -152,9 +151,3 @@ export class LikeUserDto {
 export class StarUserDto extends LikeUserDto {}
 
 export class SkipUserDto extends LikeUserDto {}
-
-export class GetListUserByUsernameDto {
-  @IsNotEmpty()
-  @ApiProperty({ type: [String], required: true, nullable: false })
-  usernames: string[];
-}

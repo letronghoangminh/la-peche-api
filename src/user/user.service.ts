@@ -10,12 +10,7 @@ import {
 import { MailService } from 'src/mail/mail.service';
 import { PageDto, PaginationHandle } from 'src/prisma/helper/prisma.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
-import {
-  CreateImageDto,
-  GetListUserByUsernameDto,
-  UpdateImageDto,
-  UpdateUserDto,
-} from './dto/user.dto';
+import { CreateImageDto, UpdateImageDto, UpdateUserDto } from './dto/user.dto';
 import { ImageModel, UserDetailInfo, UserModel } from './model/user.model';
 
 @Injectable()
@@ -965,7 +960,7 @@ export class UserService {
     options: {
       username: string;
     },
-  ): Promise<UserModel[]> {
+  ): Promise<UserDetailInfo[]> {
     const dbQuery = {
       where: {
         username: options.username,
@@ -986,15 +981,37 @@ export class UserService {
     );
     const user = await this.prismaService.user.findFirst(dbQuery);
 
-    const recommendedUsers: UserModel[] = [];
+    const randomUsers = await this.prismaService.user.findMany({
+      where: {
+        id: {
+          gte: 1,
+          lte: 10,
+        },
+      },
+      select: {
+        username: true,
+      },
+    });
+
+    randomUsers.map((random) => {
+      user.recommendedUsers.push({
+        username: random.username,
+      });
+    });
+
+    const recommendedUsers: UserDetailInfo[] = [];
 
     await Promise.all(
       user.recommendedUsers.map(async (recommendedUser) => {
-        const user = await this.getUserByUsername(recommendedUser.username, {
-          role: Role.USER,
-          username: options.username,
-        });
-        recommendedUsers.push(PlainToInstance(UserModel, user));
+        const user = await this.getUserInfoWithImagesByUsername(
+          recommendedUser.username,
+          {
+            role: Role.USER,
+            username: options.username,
+          },
+        );
+
+        recommendedUsers.push(user);
       }),
     );
 
@@ -1081,61 +1098,6 @@ export class UserService {
       }
 
       result = PlainToInstance(UserDetailInfo, user);
-    }
-
-    if (!result) throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
-
-    return result;
-  }
-
-  async getListUserByUsername(
-    query: GetListUserByUsernameDto,
-    user: {
-      role: string;
-      username: string;
-    },
-  ): Promise<UserDetailInfo[]> {
-    const result: UserDetailInfo[] = [];
-    if (user.role === Role.ADMIN) {
-      const users = await this.prismaService.user.findMany({
-        where: {
-          username: {
-            in: query.usernames,
-          },
-          isDeleted: false,
-        },
-        include: {
-          userImages: true,
-        },
-      });
-
-      result.push(PlainToInstance(UserDetailInfo, users));
-    } else {
-      const users = await this.prismaService.user.findMany({
-        where: {
-          username: {
-            in: query.usernames,
-          },
-          isDeleted: false,
-        },
-        include: {
-          userImages: true,
-        },
-      });
-
-      users.map((user) => {
-        if (user) {
-          for (const [key, value] of Object.entries(user.introShownFields)) {
-            if (!value) delete user[key];
-          }
-
-          sensitiveFields.map((field) => {
-            delete user[field];
-          });
-        }
-      });
-
-      result.push(PlainToInstance(UserDetailInfo, users));
     }
 
     if (!result) throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
