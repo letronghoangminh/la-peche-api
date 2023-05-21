@@ -10,7 +10,12 @@ import {
 import { MailService } from 'src/mail/mail.service';
 import { PageDto, PaginationHandle } from 'src/prisma/helper/prisma.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateImageDto, UpdateImageDto, UpdateUserDto } from './dto/user.dto';
+import {
+  CreateImageDto,
+  GetListUserByUsernameDto,
+  UpdateImageDto,
+  UpdateUserDto,
+} from './dto/user.dto';
 import { ImageModel, UserDetailInfo, UserModel } from './model/user.model';
 
 @Injectable()
@@ -1031,7 +1036,7 @@ export class UserService {
     return matchedUsers;
   }
 
-  async getDetailUserInfoByUsername(
+  async getUserInfoWithImagesByUsername(
     username: string,
     user: {
       role: string;
@@ -1076,6 +1081,61 @@ export class UserService {
       }
 
       result = PlainToInstance(UserDetailInfo, user);
+    }
+
+    if (!result) throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
+
+    return result;
+  }
+
+  async getListUserByUsername(
+    query: GetListUserByUsernameDto,
+    user: {
+      role: string;
+      username: string;
+    },
+  ): Promise<UserDetailInfo[]> {
+    const result: UserDetailInfo[] = [];
+    if (user.role === Role.ADMIN) {
+      const users = await this.prismaService.user.findMany({
+        where: {
+          username: {
+            in: query.usernames,
+          },
+          isDeleted: false,
+        },
+        include: {
+          userImages: true,
+        },
+      });
+
+      result.push(PlainToInstance(UserDetailInfo, users));
+    } else {
+      const users = await this.prismaService.user.findMany({
+        where: {
+          username: {
+            in: query.usernames,
+          },
+          isDeleted: false,
+        },
+        include: {
+          userImages: true,
+        },
+      });
+
+      users.map((user) => {
+        if (user) {
+          for (const [key, value] of Object.entries(user.introShownFields)) {
+            if (!value) delete user[key];
+          }
+
+          sensitiveFields.map((field) => {
+            delete user[field];
+          });
+        }
+      });
+
+      result.push(PlainToInstance(UserDetailInfo, users));
     }
 
     if (!result) throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
