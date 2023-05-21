@@ -29,7 +29,7 @@ model user {
   gender      String
   status      String
   orientation String
-  biographic  String?
+  biographic  String? @db.Text
 
   email       String  @unique
   yearOfBirth Int?
