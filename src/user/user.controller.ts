@@ -355,4 +355,20 @@ export class UserController {
       userId: user.id,
     });
   }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: UserModel })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('detail/:username')
+  getDetailUserInfoByUsername(
+    @Param('username') username: string,
+    @GetUser() user: UserType,
+  ): Promise<UserModel> {
+    return this.userService.getDetailUserInfoByUsername(username, {
+      role: user.role,
+      username: user.username,
+    });
+  }
 }

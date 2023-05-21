@@ -11,7 +11,7 @@ import { MailService } from 'src/mail/mail.service';
 import { PageDto, PaginationHandle } from 'src/prisma/helper/prisma.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateImageDto, UpdateImageDto, UpdateUserDto } from './dto/user.dto';
-import { ImageModel, UserModel } from './model/user.model';
+import { ImageModel, UserDetailInfo, UserModel } from './model/user.model';
 
 @Injectable()
 export class UserService {
@@ -1029,5 +1029,57 @@ export class UserService {
     );
 
     return matchedUsers;
+  }
+
+  async getDetailUserInfoByUsername(
+    username: string,
+    user: {
+      role: string;
+      username: string;
+    },
+  ): Promise<UserDetailInfo> {
+    let result: UserDetailInfo;
+    if (
+      (user.role === Role.USER && username === user.username) ||
+      user.role === Role.ADMIN
+    ) {
+      const user = await this.prismaService.user.findFirst({
+        where: {
+          username: username,
+          isDeleted: false,
+        },
+        include: {
+          userImages: true,
+        },
+      });
+
+      result = PlainToInstance(UserDetailInfo, user);
+    } else {
+      const user = await this.prismaService.user.findFirst({
+        where: {
+          username: username,
+          isDeleted: false,
+        },
+        include: {
+          userImages: true,
+        },
+      });
+
+      if (user) {
+        for (const [key, value] of Object.entries(user.introShownFields)) {
+          if (!value) delete user[key];
+        }
+
+        sensitiveFields.map((field) => {
+          delete user[field];
+        });
+      }
+
+      result = PlainToInstance(UserDetailInfo, user);
+    }
+
+    if (!result) throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
+
+    return result;
   }
 }

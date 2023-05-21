@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { Role } from 'src/enum/role.enum';
+import { PlainToInstance } from 'src/helpers/helpers';
 
 export class UserModel {
   @Expose()
@@ -160,4 +161,11 @@ export class ImageModel {
   @Expose()
   @ApiProperty({ type: Date })
   updatedAt: Date;
+}
+
+export class UserDetailInfo extends UserModel {
+  @Expose()
+  @ApiProperty({ type: [ImageModel] })
+  @Transform(({ obj }) => PlainToInstance(ImageModel, obj.userImages))
+  images: ImageModel[];
 }
