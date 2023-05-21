@@ -23,6 +23,7 @@ pipeline {
     DOCKER_USERNAME = credentials('DOCKER_USERNAME')
     DOCKER_PASSWORD = credentials('DOCKER_PASSWORD')
     NEW_RELIC_LICENSE_KEY = credentials('NEW_RELIC_LICENSE_KEY')
+    DATABASE_URL = credentials('DATABASE_URL')
   }
 
   parameters {
@@ -68,6 +69,7 @@ pipeline {
             cp .env.example .env
 
             sed -i "/^APP_ENV=/c APP_ENV=production" .env
+            sed -i "/^DATABASE_URL=/c DATABASE_URL=${DATABASE_URL}" .env
             sed -i "/^ROOT_API=/c ROOT_API=https://lapeche.date/api" .env
             sed -i "/^MAIL_FROM=/c MAIL_FROM=${MAIL_FROM}" .env
             sed -i "/^MAIL_USERNAME=/c MAIL_USERNAME=${MAIL_USERNAME}" .env
