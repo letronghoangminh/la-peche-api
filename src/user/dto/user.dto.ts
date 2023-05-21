@@ -151,3 +151,95 @@ export class LikeUserDto {
 export class StarUserDto extends LikeUserDto {}
 
 export class SkipUserDto extends LikeUserDto {}
+
+export class UpdateIntoShownFieldsDto {
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  yearOfBirth?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  bodyType: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  diet: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  drinks: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  drugs: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  education: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  ethnicity: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  height: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  income: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  job: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  location: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  offspring: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  pets: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  sign: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  smokes: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  speaks: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  email: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ type: Boolean, required: false })
+  phoneNumber: boolean;
+}

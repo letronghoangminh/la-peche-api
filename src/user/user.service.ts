@@ -10,8 +10,14 @@ import {
 import { MailService } from 'src/mail/mail.service';
 import { PageDto, PaginationHandle } from 'src/prisma/helper/prisma.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateImageDto, UpdateImageDto, UpdateUserDto } from './dto/user.dto';
+import {
+  CreateImageDto,
+  UpdateImageDto,
+  UpdateIntoShownFieldsDto,
+  UpdateUserDto,
+} from './dto/user.dto';
 import { ImageModel, UserDetailInfo, UserModel } from './model/user.model';
+import { instanceToPlain } from 'class-transformer';
 
 @Injectable()
 export class UserService {
@@ -1103,5 +1109,22 @@ export class UserService {
     if (!result) throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
 
     return result;
+  }
+
+  async updateIntroShownFields(
+    dto: UpdateIntoShownFieldsDto,
+    user: {
+      role: string;
+      username: string;
+    },
+  ): Promise<void> {
+    await this.prismaService.user.update({
+      where: {
+        username: user.username,
+      },
+      data: {
+        introShownFields: instanceToPlain(dto),
+      },
+    });
   }
 }
