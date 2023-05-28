@@ -314,11 +314,8 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('recommended')
-  getRecommendedUsers(
-    @Query(new ValidationPipe({ transform: true })) query: PageDto,
-    @GetUser() user: UserType,
-  ): Promise<UserDetailInfo[]> {
-    return this.userService.getRecommendedUsers(query, {
+  getRecommendedUsers(@GetUser() user: UserType): Promise<UserDetailInfo[]> {
+    return this.userService.getRecommendedUsers({
       username: user.username,
     });
   }
