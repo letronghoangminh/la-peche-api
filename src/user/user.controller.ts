@@ -361,7 +361,7 @@ export class UserController {
   @ApiOkResponse({ type: ImageModel })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
-  @Put('images/:id')
+  @Put('images/order/:id')
   changeImageOrder(
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: UserType,
