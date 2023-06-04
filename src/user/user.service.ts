@@ -18,13 +18,20 @@ import {
 } from './dto/user.dto';
 import { ImageModel, UserDetailInfo, UserModel } from './model/user.model';
 import { instanceToPlain } from 'class-transformer';
+import { ConfigService } from '@nestjs/config';
+import axios from 'axios';
 
 @Injectable()
 export class UserService {
+  private readonly recommendationSystemRoot: string;
+
   constructor(
     private prismaService: PrismaService,
     private mailService: MailService,
-  ) {}
+    private configService: ConfigService,
+  ) {
+    this.recommendationSystemRoot = this.configService.get('RS_ROOT');
+  }
 
   private async checkVerifiedUser(username: string): Promise<boolean> {
     const user = await this.prismaService.user.findFirst({
@@ -270,6 +277,10 @@ export class UserService {
       username: string;
     },
   ): Promise<UserModel> {
+    const initRSRegister = dto.init;
+
+    delete dto.init;
+
     const condition = {
       isDeleted: false,
     };
@@ -281,12 +292,50 @@ export class UserService {
       condition['username'] = username;
     else throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
 
-    const updatedUser = await this.prismaService.user.updateMany({
+    if (dto.location) dto['provinceCode'] = dto.location.split(',')[0];
+
+    await this.prismaService.user.updateMany({
       where: condition,
       data: dto,
     });
 
-    return PlainToInstance(UserModel, updatedUser[0]);
+    const updatedUser = await this.prismaService.user.findFirst({
+      where: condition,
+    });
+
+    if (initRSRegister) {
+      const registerToRSData = {
+        status: dto.status,
+        body_type: dto.bodyType,
+        diet: dto.diet,
+        drinks: dto.drinks,
+        drugs: dto.drugs,
+        education: dto.education,
+        ethnicity: dto.ethnicity,
+        job: dto.job,
+        offspring: dto.offspring,
+        pets: dto.pets,
+        religion: null,
+        sign: dto.sign,
+        smokes: dto.smokes,
+        speaks: dto.speaks,
+        age: new Date().getFullYear() - dto.yearOfBirth,
+        biographic: dto.biographic,
+      };
+
+      axios.post(
+        `${this.recommendationSystemRoot}/register`,
+        JSON.stringify(registerToRSData),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        },
+      );
+    }
+
+    return PlainToInstance(UserModel, updatedUser);
   }
 
   async deleteUser(
@@ -961,55 +1010,96 @@ export class UserService {
     return skippedUsers;
   }
 
-  async getRecommendedUsers(
-    query: PageDto,
-    options: {
-      username: string;
-    },
-  ): Promise<UserDetailInfo[]> {
-    const dbQuery = {
+  async getRecommendedUsers(options: {
+    username: string;
+  }): Promise<UserDetailInfo[]> {
+    const user = await this.prismaService.user.findFirst({
       where: {
         username: options.username,
       },
       select: {
+        id: true,
+        location: true,
+        gender: true,
+        provinceCode: true,
         recommendedUsers: {
           select: {
             username: true,
           },
         },
+        skipping: {
+          select: {
+            username: true,
+          },
+        },
+        liking: {
+          select: {
+            username: true,
+          },
+        },
+        staring: {
+          select: {
+            username: true,
+          },
+        },
       },
-    };
+    });
 
-    PaginationHandle(
-      dbQuery.select.recommendedUsers,
-      query.page,
-      query.pageSize,
+    const skippedUsernames = user.skipping.map((user) => user.username);
+    const likedUseranmes = user.liking.map((user) => user.username);
+    const starredUsernames = user.staring.map((user) => user.username);
+    const recommendedUsernames = user.recommendedUsers.map(
+      (user) => user.username,
     );
-    const user = await this.prismaService.user.findFirst(dbQuery);
 
-    const randomUsers = await this.prismaService.user.findMany({
+    const potentialUsers = await this.prismaService.user.findMany({
+      where: {
+        provinceCode: {
+          in: user.provinceCode,
+        },
+        gender: {
+          not: user.gender,
+        },
+        username: {
+          notIn: skippedUsernames.concat(
+            likedUseranmes,
+            starredUsernames,
+            recommendedUsernames,
+          ),
+        },
+      },
+    });
+
+    const potentialUserIds = potentialUsers.map((user) => user.id);
+
+    const response = await axios.post(
+      `${this.recommendationSystemRoot}/match?user_id=${user.id}`,
+      potentialUserIds,
+    );
+
+    const recommendationData: number[] = JSON.parse(
+      JSON.stringify(response.data),
+    )['rank_list'];
+
+    const recommendedUserIds = recommendationData.slice(0, 10);
+
+    const recommendedUsers = await this.prismaService.user.findMany({
       where: {
         id: {
-          gte: 1,
-          lte: 10,
+          in: recommendedUserIds,
         },
       },
       select: {
         username: true,
+        id: true,
       },
     });
 
-    randomUsers.map((random) => {
-      user.recommendedUsers.push({
-        username: random.username,
-      });
-    });
-
-    const recommendedUsers: UserDetailInfo[] = [];
+    const recommendedResults: UserDetailInfo[] = [];
 
     await Promise.all(
-      user.recommendedUsers.map(async (recommendedUser) => {
-        const user = await this.getUserInfoWithImagesByUsername(
+      recommendedUsers.map(async (recommendedUser) => {
+        const result = await this.getUserInfoWithImagesByUsername(
           recommendedUser.username,
           {
             role: Role.USER,
@@ -1017,11 +1107,24 @@ export class UserService {
           },
         );
 
-        recommendedUsers.push(user);
+        await this.prismaService.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            recommendedUsers: {
+              connect: {
+                id: recommendedUser.id,
+              },
+            },
+          },
+        });
+
+        recommendedResults.push(result);
       }),
     );
 
-    return recommendedUsers;
+    return recommendedResults;
   }
 
   async getMatchedUsers(

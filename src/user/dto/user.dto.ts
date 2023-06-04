@@ -10,6 +10,10 @@ import {
 
 export class UpdateUserDto {
   @IsOptional()
+  @ApiProperty({ type: Boolean, default: false })
+  init: boolean;
+
+  @IsOptional()
   @Expose()
   @ApiProperty({ type: String })
   @Matches(/^[a-zA-Z0-9_ ]{6,20}$/)
