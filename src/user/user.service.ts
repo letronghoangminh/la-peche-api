@@ -8,7 +8,11 @@ import {
   sensitiveFields,
 } from 'src/helpers/helpers';
 import { MailService } from 'src/mail/mail.service';
-import { PageDto, PaginationHandle } from 'src/prisma/helper/prisma.helper';
+import {
+  OrderByHandle,
+  PageDto,
+  PaginationHandle,
+} from 'src/prisma/helper/prisma.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   ChangeImageOrderDto,
@@ -982,6 +986,8 @@ export class UserService {
     };
 
     PaginationHandle(dbQuery.select.staring, query.page, query.pageSize);
+    OrderByHandle(dbQuery, [{ createdAt: 'desc' }]);
+
     const user = await this.prismaService.user.findFirst(dbQuery);
 
     const starredUsers: UserModel[] = [];
@@ -1174,6 +1180,7 @@ export class UserService {
     };
 
     PaginationHandle(dbQuery.select.matching, query.page, query.pageSize);
+    OrderByHandle(dbQuery, [{ createdAt: 'desc' }]);
     const user = await this.prismaService.user.findFirst(dbQuery);
 
     const matchedUsers: UserModel[] = [];
