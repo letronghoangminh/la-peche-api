@@ -144,7 +144,7 @@ export class UserModel {
 export class ImageModel {
   @Expose()
   @ApiProperty({ type: Number })
-  id: string;
+  id: number;
 
   @Expose()
   @ApiProperty({ type: String })
@@ -153,6 +153,10 @@ export class ImageModel {
   @Expose()
   @ApiProperty({ type: Boolean })
   isThumbnail: boolean;
+
+  @Expose()
+  @ApiProperty({ type: Number })
+  order: number;
 
   @Expose()
   @ApiProperty({ type: Date })
