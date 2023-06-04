@@ -1052,11 +1052,16 @@ export class UserService {
       (user) => user.username,
     );
 
+    const extraCondition = {};
+
+    if (user.provinceCode && user.location)
+      extraCondition['provinceCode'] = {
+        in: user.provinceCode,
+      };
+
     const potentialUsers = await this.prismaService.user.findMany({
       where: {
-        provinceCode: {
-          in: user.provinceCode,
-        },
+        ...extraCondition,
         gender: {
           not: user.gender,
         },
