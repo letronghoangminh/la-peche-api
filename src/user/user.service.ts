@@ -11,6 +11,7 @@ import { MailService } from 'src/mail/mail.service';
 import { PageDto, PaginationHandle } from 'src/prisma/helper/prisma.helper';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
+  ChangeImageOrderDto,
   CreateImageDto,
   UpdateImageDto,
   UpdateIntoShownFieldsDto,
@@ -448,6 +449,28 @@ export class UserService {
             },
           });
 
+          await this.prismaService.notification.create({
+            data: {
+              text: `You have matched with ${targetUser.username}`,
+              user: {
+                connect: {
+                  username: user.username,
+                },
+              },
+            },
+          });
+
+          await this.prismaService.notification.create({
+            data: {
+              text: `You have matched with ${user.username}`,
+              user: {
+                connect: {
+                  username: targetUser.username,
+                },
+              },
+            },
+          });
+
           await this.prismaService.user.update({
             data: {
               matching: {
@@ -814,6 +837,7 @@ export class UserService {
         userId: user.userId,
         isThumbnail: dto.isThumbnail,
         url: dto.url,
+        order: dto.order,
       },
     });
 
@@ -1234,5 +1258,130 @@ export class UserService {
         introShownFields: instanceToPlain(dto),
       },
     });
+  }
+
+  async changeImageOrder(
+    id: number,
+    dto: ChangeImageOrderDto,
+    user: {
+      role: string;
+      username: string;
+      userId: number;
+    },
+  ): Promise<ImageModel> {
+    const image = await this.prismaService.user_image.findFirst({
+      where: {
+        userId: user.userId,
+        id: id,
+      },
+    });
+
+    if (!image)
+      throw new BadRequestException(ErrorMessages.USER.USER_IMAGE_NOT_EXIST);
+
+    const largestOrderImage = await this.prismaService.user_image.findFirst({
+      where: {
+        userId: user.userId,
+      },
+      select: {
+        order: true,
+        id: true,
+      },
+      orderBy: {
+        order: 'desc',
+      },
+    });
+
+    const smallestOrderImage = await this.prismaService.user_image.findFirst({
+      where: {
+        userId: user.userId,
+      },
+      select: {
+        order: true,
+        id: true,
+      },
+      orderBy: {
+        order: 'asc',
+      },
+    });
+
+    const oldOrder = image.order;
+    const largestOrder = largestOrderImage.order;
+    const smallestOrder = smallestOrderImage.order;
+
+    if (dto.order >= largestOrder) {
+      dto.order = largestOrder;
+
+      await this.prismaService.user_image.updateMany({
+        where: {
+          order: {
+            gt: oldOrder,
+          },
+          userId: user.userId,
+        },
+        data: {
+          order: {
+            decrement: 1,
+          },
+        },
+      });
+    } else if (dto.order <= smallestOrder) {
+      dto.order = smallestOrder;
+
+      await this.prismaService.user_image.updateMany({
+        where: {
+          order: {
+            lt: oldOrder,
+          },
+          userId: user.userId,
+        },
+        data: {
+          order: {
+            increment: 1,
+          },
+        },
+      });
+    } else if (oldOrder < dto.order) {
+      await this.prismaService.user_image.updateMany({
+        where: {
+          order: {
+            gt: oldOrder,
+            lte: dto.order,
+          },
+          userId: user.userId,
+        },
+        data: {
+          order: {
+            decrement: 1,
+          },
+        },
+      });
+    } else if (oldOrder > dto.order) {
+      await this.prismaService.user_image.updateMany({
+        where: {
+          order: {
+            gte: dto.order,
+            lt: oldOrder,
+          },
+          userId: user.userId,
+        },
+        data: {
+          order: {
+            increment: 1,
+          },
+        },
+      });
+    } else if (oldOrder == dto.order) return;
+
+    await this.prismaService.user_image.update({
+      where: {
+        id: id,
+      },
+      data: {
+        order: dto.order,
+      },
+    });
+
+    return PlainToInstance(ImageModel, image);
   }
 }

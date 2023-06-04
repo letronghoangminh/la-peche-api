@@ -2,10 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 import {
   IsBoolean,
+  IsNumber,
   IsOptional,
   IsString,
   IsUrl,
   Matches,
+  Min,
 } from 'class-validator';
 
 export class UpdateUserDto {
@@ -131,6 +133,11 @@ export class CreateImageDto {
   @IsBoolean()
   @ApiProperty({ type: Boolean, required: true, nullable: false })
   isThumbnail: boolean;
+
+  @Expose()
+  @IsNumber()
+  @ApiProperty({ type: Number, required: true, nullable: false })
+  order: number;
 }
 
 export class UpdateImageDto {
@@ -246,4 +253,11 @@ export class UpdateIntoShownFieldsDto {
   @IsBoolean()
   @ApiProperty({ type: Boolean, required: false })
   phoneNumber: boolean;
+}
+
+export class ChangeImageOrderDto {
+  @IsNumber()
+  @ApiProperty({ type: Number, required: true })
+  @Min(1)
+  order: number;
 }

@@ -25,6 +25,7 @@ import { AdminGuard, UserGuard } from 'src/auth/guard/auth.guard';
 import { APISummaries } from 'src/helpers/helpers';
 import { PageDto } from 'src/prisma/helper/prisma.helper';
 import {
+  ChangeImageOrderDto,
   CreateImageDto,
   LikeUserDto,
   SkipUserDto,
@@ -342,13 +343,31 @@ export class UserController {
   @ApiOkResponse({ type: ImageModel })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
-  @Delete('images/:id')
+  @Put('images/:id')
   updateImageById(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateImageDto,
     @GetUser() user: UserType,
+    @Body() dto: UpdateImageDto,
   ): Promise<ImageModel> {
     return this.userService.updateImageById(id, dto, {
+      role: user.role,
+      username: user.username,
+      userId: user.id,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: ImageModel })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Put('images/:id')
+  changeImageOrder(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: UserType,
+    @Body() dto: ChangeImageOrderDto,
+  ): Promise<ImageModel> {
+    return this.userService.changeImageOrder(id, dto, {
       role: user.role,
       username: user.username,
       userId: user.id,

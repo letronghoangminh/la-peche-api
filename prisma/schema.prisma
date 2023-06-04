@@ -104,6 +104,7 @@ model user_image {
   id          Int     @id @default(autoincrement())
   url         String
   isThumbnail Boolean
+  order       Int?
 
   createdAt DateTime @default(now()) @db.DateTime(0)
   updatedAt DateTime @default(now()) @updatedAt @db.DateTime(0)
