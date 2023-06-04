@@ -31,24 +31,25 @@ model user {
   orientation String
   biographic  String? @db.Text
 
-  email       String  @unique
-  yearOfBirth Int?
-  bodyType    String?
-  diet        String?
-  drinks      String?
-  drugs       String?
-  education   String?
-  ethnicity   String?
-  height      Float?
-  income      Float?
-  job         String?
-  location    String?
-  offspring   String?
-  pets        String?
-  sign        String?
-  smokes      String?
-  speaks      String?
-  phoneNumber String?
+  email        String  @unique
+  yearOfBirth  Int?
+  bodyType     String?
+  diet         String?
+  drinks       String?
+  drugs        String?
+  education    String?
+  ethnicity    String?
+  height       Float?
+  income       Float?
+  job          String?
+  location     String?
+  provinceCode String?
+  offspring    String?
+  pets         String?
+  sign         String?
+  smokes       String?
+  speaks       String?
+  phoneNumber  String?
 
   notifications    notification[]
   coupons          coupon[]

@@ -292,6 +292,8 @@ export class UserService {
       condition['username'] = username;
     else throw new BadRequestException(ErrorMessages.USER.USER_INVALID);
 
+    if (dto.location) dto['provinceCode'] = dto.location.split(',')[0];
+
     await this.prismaService.user.updateMany({
       where: condition,
       data: dto,
@@ -1019,6 +1021,7 @@ export class UserService {
         id: true,
         location: true,
         gender: true,
+        provinceCode: true,
         recommendedUsers: {
           select: {
             username: true,
@@ -1051,8 +1054,8 @@ export class UserService {
 
     const potentialUsers = await this.prismaService.user.findMany({
       where: {
-        location: {
-          in: user.location,
+        provinceCode: {
+          in: user.provinceCode,
         },
         gender: {
           not: user.gender,
