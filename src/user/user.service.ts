@@ -872,6 +872,20 @@ export class UserService {
       },
     });
 
+    await this.prismaService.user_image.updateMany({
+      where: {
+        userId: user.userId,
+        order: {
+          gt: image.order,
+        },
+      },
+      data: {
+        order: {
+          decrement: 1,
+        },
+      },
+    });
+
     return PlainToInstance(ImageModel, userImage);
   }
 
