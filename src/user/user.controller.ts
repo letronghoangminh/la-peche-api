@@ -251,14 +251,14 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.USER })
-  @ApiOkResponse({ type: UserModel })
+  @ApiOkResponse({ type: UserDetailInfo })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('liked')
   getLikedUsers(
     @Query(new ValidationPipe({ transform: true })) query: PageDto,
     @GetUser() user: UserType,
-  ): Promise<UserModel[]> {
+  ): Promise<UserDetailInfo[]> {
     return this.userService.getLikedUsers(query, {
       username: user.username,
     });
@@ -266,14 +266,14 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.USER })
-  @ApiOkResponse({ type: UserModel })
+  @ApiOkResponse({ type: UserDetailInfo })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('starred')
   getStarredUsers(
     @Query(new ValidationPipe({ transform: true })) query: PageDto,
     @GetUser() user: UserType,
-  ): Promise<UserModel[]> {
+  ): Promise<UserDetailInfo[]> {
     return this.userService.getStarredUsers(query, {
       username: user.username,
     });
@@ -281,14 +281,14 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.USER })
-  @ApiOkResponse({ type: UserModel })
+  @ApiOkResponse({ type: UserDetailInfo })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('skipped')
   getSkippedUsers(
     @Query(new ValidationPipe({ transform: true })) query: PageDto,
     @GetUser() user: UserType,
-  ): Promise<UserModel[]> {
+  ): Promise<UserDetailInfo[]> {
     return this.userService.getSkippedUsers(query, {
       username: user.username,
     });
@@ -296,14 +296,14 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.USER })
-  @ApiOkResponse({ type: UserModel })
+  @ApiOkResponse({ type: UserDetailInfo })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('matched')
   getMatchedUsers(
     @Query(new ValidationPipe({ transform: true })) query: PageDto,
     @GetUser() user: UserType,
-  ): Promise<UserModel[]> {
+  ): Promise<UserDetailInfo[]> {
     return this.userService.getMatchedUsers(query, {
       username: user.username,
     });

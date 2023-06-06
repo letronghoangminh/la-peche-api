@@ -950,7 +950,7 @@ export class UserService {
   async getLikedUsers(
     query: PageDto,
     options: { username: string },
-  ): Promise<UserModel[]> {
+  ): Promise<UserDetailInfo[]> {
     const dbQuery = {
       where: {
         username: options.username,
@@ -967,15 +967,18 @@ export class UserService {
     PaginationHandle(dbQuery.select.liking, query.page, query.pageSize);
     const user = await this.prismaService.user.findFirst(dbQuery);
 
-    const likedUsers: UserModel[] = [];
+    const likedUsers: UserDetailInfo[] = [];
 
     await Promise.all(
       user.liking.map(async (likedUser) => {
-        const user = await this.getUserByUsername(likedUser.username, {
-          role: Role.USER,
-          username: options.username,
-        });
-        likedUsers.push(PlainToInstance(UserModel, user));
+        const user = await this.getUserInfoWithImagesByUsername(
+          likedUser.username,
+          {
+            role: Role.USER,
+            username: options.username,
+          },
+        );
+        likedUsers.push(PlainToInstance(UserDetailInfo, user));
       }),
     );
 
@@ -985,7 +988,7 @@ export class UserService {
   async getStarredUsers(
     query: PageDto,
     options: { username: string },
-  ): Promise<UserModel[]> {
+  ): Promise<UserDetailInfo[]> {
     const dbQuery = {
       where: {
         username: options.username,
@@ -1004,15 +1007,18 @@ export class UserService {
 
     const user = await this.prismaService.user.findFirst(dbQuery);
 
-    const starredUsers: UserModel[] = [];
+    const starredUsers: UserDetailInfo[] = [];
 
     await Promise.all(
       user.staring.map(async (starredUser) => {
-        const user = await this.getUserByUsername(starredUser.username, {
-          role: Role.USER,
-          username: options.username,
-        });
-        starredUsers.push(PlainToInstance(UserModel, user));
+        const user = await this.getUserInfoWithImagesByUsername(
+          starredUser.username,
+          {
+            role: Role.USER,
+            username: options.username,
+          },
+        );
+        starredUsers.push(PlainToInstance(UserDetailInfo, user));
       }),
     );
 
@@ -1022,7 +1028,7 @@ export class UserService {
   async getSkippedUsers(
     query: PageDto,
     options: { username: string },
-  ): Promise<UserModel[]> {
+  ): Promise<UserDetailInfo[]> {
     const dbQuery = {
       where: {
         username: options.username,
@@ -1039,15 +1045,18 @@ export class UserService {
     PaginationHandle(dbQuery.select.skipping, query.page, query.pageSize);
     const user = await this.prismaService.user.findFirst(dbQuery);
 
-    const skippedUsers: UserModel[] = [];
+    const skippedUsers: UserDetailInfo[] = [];
 
     await Promise.all(
       user.skipping.map(async (skippedUser) => {
-        const user = await this.getUserByUsername(skippedUser.username, {
-          role: Role.USER,
-          username: options.username,
-        });
-        skippedUsers.push(PlainToInstance(UserModel, user));
+        const user = await this.getUserInfoWithImagesByUsername(
+          skippedUser.username,
+          {
+            role: Role.USER,
+            username: options.username,
+          },
+        );
+        skippedUsers.push(PlainToInstance(UserDetailInfo, user));
       }),
     );
 
@@ -1179,7 +1188,7 @@ export class UserService {
   async getMatchedUsers(
     query: PageDto,
     options: { username: string },
-  ): Promise<UserModel[]> {
+  ): Promise<UserDetailInfo[]> {
     const dbQuery = {
       where: {
         username: options.username,
@@ -1197,15 +1206,18 @@ export class UserService {
     OrderByHandle(dbQuery, [{ createdAt: 'desc' }]);
     const user = await this.prismaService.user.findFirst(dbQuery);
 
-    const matchedUsers: UserModel[] = [];
+    const matchedUsers: UserDetailInfo[] = [];
 
     await Promise.all(
       user.matching.map(async (matchedUser) => {
-        const user = await this.getUserByUsername(matchedUser.username, {
-          role: Role.USER,
-          username: options.username,
-        });
-        matchedUsers.push(PlainToInstance(UserModel, user));
+        const user = await this.getUserInfoWithImagesByUsername(
+          matchedUser.username,
+          {
+            role: Role.USER,
+            username: options.username,
+          },
+        );
+        matchedUsers.push(PlainToInstance(UserDetailInfo, user));
       }),
     );
 
