@@ -78,6 +78,7 @@ export const Messages = {
     USER_UNSTARRED: 'This user has been unstarred',
     USER_SKIPPED: 'This user has been skipped',
     USER_UNSKIPPED: 'This user has been unskipped',
+    USER_BANNED: 'This user has been banned',
   },
 };
 

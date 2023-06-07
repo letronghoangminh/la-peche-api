@@ -216,17 +216,20 @@ export class UserService {
       });
   }
 
-  async getAllUsers(query: PageDto): Promise<UserModel[]> {
+  async getAllUsers(query: PageDto): Promise<UserDetailInfo[]> {
     const dbQuery = {
       where: {
         isDeleted: false,
+      },
+      include: {
+        userImages: true,
       },
     };
 
     PaginationHandle(dbQuery, query.page, query.pageSize);
     const users = await this.prismaService.user.findMany(dbQuery);
 
-    return PlainToInstance(UserModel, users);
+    return PlainToInstance(UserDetailInfo, users);
   }
 
   async getUserByUsername(
@@ -377,6 +380,19 @@ export class UserService {
       throw new BadRequestException(
         'Username not match or user is already deleted',
       );
+  }
+
+  async banUser(username: string): Promise<string> {
+    await this.prismaService.user.update({
+      where: {
+        username: username,
+      },
+      data: {
+        isActivated: false,
+      },
+    });
+
+    return Messages.USER.USER_BANNED;
   }
 
   async likeUser(
@@ -1034,7 +1050,7 @@ export class UserService {
             username: options.username,
           },
         );
-        starredUsers.push(PlainToInstance(UserDetailInfo, user));
+        starredUsers.push(user);
       }),
     );
 
@@ -1167,6 +1183,8 @@ export class UserService {
         username: {
           notIn: skippedUsernames.concat(likedUsernames, starredUsernames),
         },
+        isActivated: true,
+        isDeleted: false,
       },
     });
 

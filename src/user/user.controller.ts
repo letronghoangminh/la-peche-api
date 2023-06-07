@@ -25,6 +25,7 @@ import { AdminGuard, UserGuard } from 'src/auth/guard/auth.guard';
 import { APISummaries } from 'src/helpers/helpers';
 import { PageDto } from 'src/prisma/helper/prisma.helper';
 import {
+  BanUserDto,
   ChangeImageOrderDto,
   CreateImageDto,
   GetRecommendedUsersDto,
@@ -47,13 +48,13 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.ADMIN })
-  @ApiOkResponse({ type: UserModel })
+  @ApiOkResponse({ type: UserDetailInfo })
   @ApiBearerAuth()
   @UseGuards(AdminGuard)
   @Get()
   getAllUsers(
     @Query(new ValidationPipe({ transform: true })) query: PageDto,
-  ): Promise<UserModel[]> {
+  ): Promise<UserDetailInfo[]> {
     return this.userService.getAllUsers(query);
   }
 
@@ -139,6 +140,16 @@ export class UserController {
       role: user.role,
       username: user.username,
     });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.ADMIN })
+  @ApiOkResponse({ type: String })
+  @ApiBearerAuth()
+  @UseGuards(AdminGuard)
+  @Post('ban')
+  banUser(@Body() dto: BanUserDto): Promise<string> {
+    return this.userService.banUser(dto.username);
   }
 
   @HttpCode(HttpStatus.OK)

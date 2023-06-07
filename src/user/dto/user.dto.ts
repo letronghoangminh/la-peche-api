@@ -163,6 +163,8 @@ export class StarUserDto extends LikeUserDto {}
 
 export class SkipUserDto extends LikeUserDto {}
 
+export class BanUserDto extends LikeUserDto {}
+
 export class UpdateIntoShownFieldsDto {
   @IsOptional()
   @IsBoolean()
