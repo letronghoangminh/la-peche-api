@@ -17,6 +17,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import {
   ChangeImageOrderDto,
   CreateImageDto,
+  GetRecommendedUsersDto,
   UpdateImageDto,
   UpdateIntoShownFieldsDto,
   UpdateUserDto,
@@ -978,11 +979,26 @@ export class UserService {
             username: options.username,
           },
         );
-        likedUsers.push(PlainToInstance(UserDetailInfo, user));
+        likedUsers.push(user);
       }),
     );
 
     return likedUsers;
+  }
+
+  async getLikedUsersCount(options: { username: string }): Promise<number> {
+    const count = (
+      await this.prismaService.user.findFirst({
+        where: {
+          username: options.username,
+        },
+        select: {
+          liking: true,
+        },
+      })
+    ).liking.length;
+
+    return count;
   }
 
   async getStarredUsers(
@@ -1025,6 +1041,21 @@ export class UserService {
     return starredUsers;
   }
 
+  async getStarredUsersCount(options: { username: string }): Promise<number> {
+    const count = (
+      await this.prismaService.user.findFirst({
+        where: {
+          username: options.username,
+        },
+        select: {
+          staring: true,
+        },
+      })
+    ).staring.length;
+
+    return count;
+  }
+
   async getSkippedUsers(
     query: PageDto,
     options: { username: string },
@@ -1063,9 +1094,27 @@ export class UserService {
     return skippedUsers;
   }
 
-  async getRecommendedUsers(options: {
-    username: string;
-  }): Promise<UserDetailInfo[]> {
+  async getSkippedUsersCount(options: { username: string }): Promise<number> {
+    const count = (
+      await this.prismaService.user.findFirst({
+        where: {
+          username: options.username,
+        },
+        select: {
+          skipping: true,
+        },
+      })
+    ).skipping.length;
+
+    return count;
+  }
+
+  async getRecommendedUsers(
+    query: GetRecommendedUsersDto,
+    options: {
+      username: string;
+    },
+  ): Promise<UserDetailInfo[]> {
     const user = await this.prismaService.user.findFirst({
       where: {
         username: options.username,
@@ -1099,11 +1148,8 @@ export class UserService {
     });
 
     const skippedUsernames = user.skipping.map((user) => user.username);
-    const likedUseranmes = user.liking.map((user) => user.username);
+    const likedUsernames = user.liking.map((user) => user.username);
     const starredUsernames = user.staring.map((user) => user.username);
-    const recommendedUsernames = user.recommendedUsers.map(
-      (user) => user.username,
-    );
 
     const extraCondition = {};
 
@@ -1119,11 +1165,7 @@ export class UserService {
           not: user.gender,
         },
         username: {
-          notIn: skippedUsernames.concat(
-            likedUseranmes,
-            starredUsernames,
-            recommendedUsernames,
-          ),
+          notIn: skippedUsernames.concat(likedUsernames, starredUsernames),
         },
       },
     });
@@ -1139,7 +1181,7 @@ export class UserService {
       JSON.stringify(response.data),
     )['rank_list'];
 
-    const recommendedUserIds = recommendationData.slice(0, 10);
+    const recommendedUserIds = recommendationData.slice(0, query.quantity);
 
     const recommendedUsers = await this.prismaService.user.findMany({
       where: {
@@ -1217,11 +1259,26 @@ export class UserService {
             username: options.username,
           },
         );
-        matchedUsers.push(PlainToInstance(UserDetailInfo, user));
+        matchedUsers.push(user);
       }),
     );
 
     return matchedUsers;
+  }
+
+  async getMatchedUsersCount(options: { username: string }): Promise<number> {
+    const count = (
+      await this.prismaService.user.findFirst({
+        where: {
+          username: options.username,
+        },
+        select: {
+          matched: true,
+        },
+      })
+    ).matched.length;
+
+    return count;
   }
 
   async getUserInfoWithImagesByUsername(

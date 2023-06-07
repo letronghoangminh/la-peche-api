@@ -27,6 +27,7 @@ import { PageDto } from 'src/prisma/helper/prisma.helper';
 import {
   ChangeImageOrderDto,
   CreateImageDto,
+  GetRecommendedUsersDto,
   LikeUserDto,
   SkipUserDto,
   StarUserDto,
@@ -266,6 +267,18 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: Number })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('liked-count')
+  getLikedUsersCount(@GetUser() user: UserType): Promise<number> {
+    return this.userService.getLikedUsersCount({
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
   @ApiOkResponse({ type: UserDetailInfo })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
@@ -275,6 +288,18 @@ export class UserController {
     @GetUser() user: UserType,
   ): Promise<UserDetailInfo[]> {
     return this.userService.getStarredUsers(query, {
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: Number })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('starred-count')
+  getStarredUsersCount(@GetUser() user: UserType): Promise<number> {
+    return this.userService.getStarredUsersCount({
       username: user.username,
     });
   }
@@ -296,6 +321,18 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: Number })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('skipped-count')
+  getSkippedUsersCount(@GetUser() user: UserType): Promise<number> {
+    return this.userService.getSkippedUsersCount({
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
   @ApiOkResponse({ type: UserDetailInfo })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
@@ -311,12 +348,28 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: Number })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('matched-count')
+  getMatchedUsersCount(@GetUser() user: UserType): Promise<number> {
+    return this.userService.getMatchedUsersCount({
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
   @ApiOkResponse({ type: UserDetailInfo })
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @Get('recommended')
-  getRecommendedUsers(@GetUser() user: UserType): Promise<UserDetailInfo[]> {
-    return this.userService.getRecommendedUsers({
+  getRecommendedUsers(
+    @Query(new ValidationPipe({ transform: true }))
+    query: GetRecommendedUsersDto,
+    @GetUser() user: UserType,
+  ): Promise<UserDetailInfo[]> {
+    return this.userService.getRecommendedUsers(query, {
       username: user.username,
     });
   }

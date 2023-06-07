@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsNumber,
@@ -260,4 +260,11 @@ export class ChangeImageOrderDto {
   @ApiProperty({ type: Number, required: true })
   @Min(1)
   order: number;
+}
+
+export class GetRecommendedUsersDto {
+  @Type(() => Number)
+  @ApiProperty({ type: Number, required: true })
+  @Min(1)
+  quantity: number;
 }
