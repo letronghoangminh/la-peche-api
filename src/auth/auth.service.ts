@@ -160,6 +160,9 @@ export class AuthService {
   }
 
   async resetPassword(dto: ResetPasswordDto): Promise<void> {
+    if (!dto.token)
+      throw new BadRequestException(ErrorMessages.AUTH.INVALID_TOKEN);
+
     const user = await this.prisma.user.findFirst({
       where: {
         resetToken: dto.token,
