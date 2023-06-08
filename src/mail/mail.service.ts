@@ -32,7 +32,7 @@ export class MailService {
   ) {
     const url = `${this.config.get(
       'APPLICATION_ROOT',
-    )}/reset-password?token=${token}`;
+    )}/auth/reset-password?token=${token}`;
 
     await this.mailerService.sendMail({
       to: user.email,
