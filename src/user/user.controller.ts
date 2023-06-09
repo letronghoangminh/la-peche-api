@@ -387,6 +387,18 @@ export class UserController {
 
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: APISummaries.USER })
+  @ApiOkResponse({ type: UserDetailInfo })
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @Get('next-recommended')
+  getNextRecommendedUser(@GetUser() user: UserType): Promise<UserDetailInfo> {
+    return this.userService.getNextRecommendedUser({
+      username: user.username,
+    });
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: APISummaries.USER })
   @ApiOkResponse({ type: ImageModel })
   @ApiBearerAuth()
   @UseGuards(UserGuard)

@@ -1245,6 +1245,122 @@ export class UserService {
     return recommendedResults;
   }
 
+  async getNextRecommendedUser(options: {
+    username: string;
+  }): Promise<UserDetailInfo> {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        username: options.username,
+      },
+      select: {
+        id: true,
+        location: true,
+        gender: true,
+        provinceCode: true,
+        recommendedUsers: {
+          select: {
+            username: true,
+          },
+        },
+        skipping: {
+          select: {
+            username: true,
+          },
+        },
+        liking: {
+          select: {
+            username: true,
+          },
+        },
+        staring: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+
+    const skippedUsernames = user.skipping.map((user) => user.username);
+    const likedUsernames = user.liking.map((user) => user.username);
+    const starredUsernames = user.staring.map((user) => user.username);
+    const recommendedUsernames = user.recommendedUsers.map(
+      (user) => user.username,
+    );
+
+    const extraCondition = {};
+
+    if (user.provinceCode && user.location)
+      extraCondition['provinceCode'] = {
+        in: user.provinceCode,
+      };
+
+    const potentialUsers = await this.prismaService.user.findMany({
+      where: {
+        ...extraCondition,
+        gender: {
+          not: user.gender,
+        },
+        username: {
+          notIn: skippedUsernames.concat(
+            likedUsernames,
+            starredUsernames,
+            recommendedUsernames,
+          ),
+        },
+        isActivated: true,
+        isDeleted: false,
+      },
+    });
+
+    const potentialUserIds = potentialUsers.map((user) => user.id);
+
+    const response = await axios.post(
+      `${this.recommendationSystemRoot}/match?user_id=${user.id}`,
+      potentialUserIds,
+    );
+
+    const recommendationData: number[] = JSON.parse(
+      JSON.stringify(response.data),
+    )['rank_list'];
+
+    const recommendedUserIds = recommendationData.slice(0, 1);
+
+    const recommendedUser = await this.prismaService.user.findFirst({
+      where: {
+        id: {
+          in: recommendedUserIds,
+        },
+      },
+      select: {
+        username: true,
+        id: true,
+      },
+    });
+
+    const result = await this.getUserInfoWithImagesByUsername(
+      recommendedUser.username,
+      {
+        role: Role.USER,
+        username: options.username,
+      },
+    );
+
+    await this.prismaService.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        recommendedUsers: {
+          connect: {
+            id: recommendedUser.id,
+          },
+        },
+      },
+    });
+
+    return PlainToInstance(UserDetailInfo, result);
+  }
+
   async getMatchedUsers(
     query: PageDto,
     options: { username: string },
