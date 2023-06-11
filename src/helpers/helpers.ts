@@ -22,7 +22,6 @@ export const introShownFields = {
 };
 
 export const sensitiveFields = [
-  'id',
   'cluster',
   'isActivated',
   'isDeleted',
