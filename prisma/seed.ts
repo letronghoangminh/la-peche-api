@@ -13,16 +13,17 @@ function getRandomInt(min: number, max: number): number {
 }
 
 function makeEmail(length: number): string {
-  let result: string = '';
-  const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength: number = characters.length;
-  let counter: number = 0;
+  let counter = 0;
 
   while (counter < length) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
     counter += 1;
   }
-  return result + "@gmail.com";
+  return result + '@gmail.com';
 }
 
 async function main() {
@@ -78,6 +79,7 @@ async function main() {
   const speaks: string[] = ['Flexing', 'Vietnamese', 'English'];
 
   const introShownFields = {
+    id: true,
     yearOfBirth: true,
     bodyType: true,
     diet: true,
@@ -131,7 +133,7 @@ async function main() {
         smokes: randomChoice(smokes),
         speaks: randomChoice(speaks),
         introShownFields: introShownFields,
-      }
+      },
     });
   });
 
@@ -168,18 +170,18 @@ async function main() {
         smokes: randomChoice(smokes),
         speaks: randomChoice(speaks),
         introShownFields: introShownFields,
-      }
+      },
     });
   });
 
-  await new Promise(r => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 2000));
 
   await prisma.notification.create({
     data: {
       text: 'Congrats, you are the admin',
       status: 'UNREAD',
       userId: 1,
-    }
+    },
   });
 
   await prisma.coupon.create({
@@ -187,7 +189,7 @@ async function main() {
       code: 'DAKWA',
       discountPercent: 100,
       userId: 1,
-    }
+    },
   });
 
   await prisma.report.create({
@@ -197,24 +199,24 @@ async function main() {
       reporterName: 'psycholog1st',
       targetName: 'chovbeovkieu',
       status: 'PENDING',
-    }
+    },
   });
 
   await prisma.user_image.create({
     data: {
-      url: "https://cc.com/image123",
+      url: 'https://cc.com/image123',
       isThumbnail: true,
       userId: 1,
-    }
+    },
   });
 }
 
 main()
   .then(async () => {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
   });
