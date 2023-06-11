@@ -1190,16 +1190,22 @@ export class UserService {
 
     const potentialUserIds = potentialUsers.map((user) => user.id);
 
-    const response = await axios.post(
-      `${this.recommendationSystemRoot}/match?user_id=${user.id}`,
-      potentialUserIds,
-    );
+    let recommendedUserIds: number[];
 
-    const recommendationData: number[] = JSON.parse(
-      JSON.stringify(response.data),
-    )['rank_list'];
+    try {
+      const response = await axios.post(
+        `${this.recommendationSystemRoot}/match?user_id=${user.id}`,
+        potentialUserIds,
+      );
 
-    const recommendedUserIds = recommendationData.slice(0, query.quantity);
+      const recommendationData: number[] = JSON.parse(
+        JSON.stringify(response.data),
+      )['rank_list'];
+
+      recommendedUserIds = recommendationData.slice(0, query.quantity);
+    } catch (err) {
+      recommendedUserIds = potentialUserIds;
+    }
 
     const recommendedUsers = await this.prismaService.user.findMany({
       where: {
@@ -1314,16 +1320,22 @@ export class UserService {
 
     const potentialUserIds = potentialUsers.map((user) => user.id);
 
-    const response = await axios.post(
-      `${this.recommendationSystemRoot}/match?user_id=${user.id}`,
-      potentialUserIds,
-    );
+    let recommendedUserIds: number[];
 
-    const recommendationData: number[] = JSON.parse(
-      JSON.stringify(response.data),
-    )['rank_list'];
+    try {
+      const response = await axios.post(
+        `${this.recommendationSystemRoot}/match?user_id=${user.id}`,
+        potentialUserIds,
+      );
 
-    const recommendedUserIds = recommendationData.slice(0, 1);
+      const recommendationData: number[] = JSON.parse(
+        JSON.stringify(response.data),
+      )['rank_list'];
+
+      recommendedUserIds = recommendationData.slice(0, 1);
+    } catch (error) {
+      recommendedUserIds = potentialUserIds;
+    }
 
     const recommendedUser = await this.prismaService.user.findFirst({
       where: {
